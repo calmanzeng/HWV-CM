@@ -13,6 +13,8 @@
     .support h2 { margin-top: 14px; font-size: var(--fs-xl); font-weight: 700; line-height: 1.4; }
     .support .copy { margin-top: 10px; color: var(--ink-2); font-size: var(--fs-base); line-height: 1.75; }
     .note { margin-top: 16px; padding: 13px 14px; border-radius: var(--radius-md); background: var(--surface-muted); font-size: var(--fs-sm); color: var(--ink-2); line-height: 1.7; }
+    #safety-context { margin-top: 14px; padding: 12px 14px; border-radius: var(--radius-md); background: var(--primary-soft); color: var(--primary-dark); font-size: var(--fs-sm); line-height: 1.65; }
+    #safety-context[hidden] { display: none; }
   </style>
 </head>
 <body>
@@ -29,6 +31,7 @@
       </div>
       <h2>你的安全，比任何一件事都重要</h2>
       <p class="copy">如果你担心继续记录会带来威胁、控制、报复或任何人身风险，请先停下来。这里不会逼你继续，也不会替你联系任何人。</p>
+      <p id="safety-context" hidden></p>
       <div class="note">
         <strong>你可以这样做：</strong><br>
         · 联系你信任的人，请他们陪你聊聊；<br>
@@ -37,10 +40,10 @@
         本产品不提供、也不编造任何热线号码。请自行核实当地可靠渠道。
       </div>
       <div class="actions">
-        <a class="btn btn-danger-soft btn-block" href="home.html">停止并回到首页</a>
-        <a class="btn btn-quiet btn-block" href="event-start.html">我准备好后再继续</a>
+        <a class="btn btn-danger-soft btn-block" id="btn-stop" href="home.html">停止并回到首页</a>
+        <a class="btn btn-quiet btn-block" id="btn-resume" href="event-start.html?reset=1">我准备好后再继续</a>
       </div>
-      <p class="footer-note">选择任何担忧选项时，流程会停留在这里，不会进入下一步。</p>
+      <p class="footer-note">流程会停留在这里。「我准备好后再继续」将返回上一步并重新进行安全检查，不会沿用这次的结论。</p>
     </section>
   </main>
   <nav class="tabbar" aria-label="主导航">
@@ -51,5 +54,39 @@
     <a class="tab-item" href="reflect.html"><svg viewBox="0 0 24 24"><path d="M5 9h14v11H5zM6 3v4m12-4v4M8 14h3m-3 3h7"/></svg>成长</a>
   </nav>
 </div>
+<script>
+(function () {
+  'use strict';
+  var SAFETY_KEY = 'hwv.flow.safety';
+  var TEXT = {
+    worried: '你刚才选择的是「我有一些担忧或不确定」，所以流程先停在这里。',
+    stop: '你刚才选择的是「我现在不想继续」，所以流程先停在这里。'
+  };
+  var ctx = document.getElementById('safety-context');
+  var stopBtn = document.getElementById('btn-stop');
+
+  var storage = (function () {
+    try {
+      window.sessionStorage.setItem('hwv.probe', '1');
+      window.sessionStorage.removeItem('hwv.probe');
+      return window.sessionStorage;
+    } catch (e) {
+      return null;
+    }
+  })();
+
+  var value = null;
+  try { value = storage ? storage.getItem(SAFETY_KEY) : null; } catch (e) { value = null; }
+
+  if (value && TEXT[value]) {
+    ctx.textContent = TEXT[value];
+    ctx.hidden = false;
+  }
+
+  stopBtn.addEventListener('click', function () {
+    try { if (storage) storage.removeItem(SAFETY_KEY); } catch (e) {}
+  });
+})();
+</script>
 </body>
 </html>
