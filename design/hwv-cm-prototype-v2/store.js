@@ -49,6 +49,23 @@
     return base;
   }
 
+  function hasExtraContent(extra) {
+    var source = extra || {};
+    var k, n, val;
+    for (k in source) {
+      if (!Object.prototype.hasOwnProperty.call(source, k)) continue;
+      val = source[k];
+      if (typeof val === 'string' && val.trim()) return true;
+      if (val && typeof val === 'object') {
+        for (n in val) {
+          if (!Object.prototype.hasOwnProperty.call(val, n)) continue;
+          if (typeof val[n] === 'string' && val[n].trim()) return true;
+        }
+      }
+    }
+    return false;
+  }
+
   function read() {
     if (!box) return normalize(fallback);
     try {
@@ -110,21 +127,7 @@
       }
       if (s.results) return true;
       if (s.observations.length || s.agreements.length) return true;
-
-      var extra = s.extra || {};
-      var k;
-      for (k in extra) {
-        if (!Object.prototype.hasOwnProperty.call(extra, k)) continue;
-        var val = extra[k];
-        if (typeof val === 'string' && val.trim()) return true;
-        if (val && typeof val === 'object') {
-          var n;
-          for (n in val) {
-            if (!Object.prototype.hasOwnProperty.call(val, n)) continue;
-            if (typeof val[n] === 'string' && val[n].trim()) return true;
-          }
-        }
-      }
+      if (hasExtraContent(s.extra)) return true;
       return false;
     },
 
@@ -143,7 +146,8 @@
 
       if (!hasAny) {
         s.event = null;
-        if (!s.results && !s.observations.length && !s.agreements.length) {
+        var hasOther = !!(s.results || s.observations.length || s.agreements.length || hasExtraContent(s.extra));
+        if (!hasOther) {
           if (!box) {
             fallback = null;
             notify(blank());
