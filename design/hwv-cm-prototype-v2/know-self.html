@@ -14,6 +14,7 @@
     .q-card .hint { margin-top: 10px; color: var(--muted); font-size: var(--fs-sm); line-height: 1.6; }
     .q-card .form-field { margin-top: 18px; }
     .skip-row { display: flex; justify-content: space-between; margin-top: 14px; }
+    .link-btn { background: none; border: none; padding: 0; cursor: pointer; font-family: inherit; }
   </style>
 </head>
 <body>
@@ -29,7 +30,7 @@
     <h1 class="page-title">慢慢来，不着急</h1>
     <p class="page-lede">这里没有标准答案，也没有对错。你可以跳过任何问题，写下的内容只属于你，随时可以保存或修改。</p>
 
-    <div class="q-progress"><span>问题 1 / 18</span><span>已保存 · 随时可继续</span></div>
+    <div class="q-progress"><span>问题 1 / 18（原型演示第 1 问）</span><span id="q-state">尚未保存</span></div>
     <div class="steps">
       <span class="step-dot current"></span><span class="step-dot"></span><span class="step-dot"></span><span class="step-dot"></span><span class="step-dot"></span>
     </div>
@@ -43,14 +44,14 @@
         <textarea class="textarea" id="a1" placeholder="例如：我更在乎提前通知，因为那让我觉得被尊重……"></textarea>
       </div>
       <div class="skip-row">
-        <span class="link">跳过这一问</span>
+        <button type="button" class="link link-btn" id="btn-skip">跳过这一问</button>
         <span class="pill">默认私密</span>
       </div>
     </section>
 
     <div class="actions">
-      <a class="btn btn-primary btn-block" href="know-self.html">保存并继续</a>
-      <a class="btn btn-quiet btn-block" href="home.html">暂时离开，已自动保存</a>
+      <a class="btn btn-primary btn-block" href="profile.html" id="btn-save">保存并继续</a>
+      <a class="btn btn-quiet btn-block" href="home.html" id="btn-leave">暂时离开（会自动保存）</a>
     </div>
     <p class="footer-note">你的回答只保存在本机，不会用于任何评分或与他人比较。</p>
   </main>
@@ -62,5 +63,64 @@
     <a class="tab-item" href="reflect.html"><svg viewBox="0 0 24 24"><path d="M5 9h14v11H5zM6 3v4m12-4v4M8 14h3m-3 3h7"/></svg>成长</a>
   </nav>
 </div>
+<script src="store.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var S = window.HWVStore;
+  var ta = document.getElementById('a1');
+  var stateEl = document.getElementById('q-state');
+  var KEY = 'knowSelf.q1';
+  var timer = null;
+
+  function setState(t) { stateEl.textContent = t; }
+
+  function save() {
+    if (!S || !S.available) { setState('无法保存（浏览器存储不可用）'); return false; }
+    var text = (ta.value || '').trim();
+    if (!text) { setState('尚未填写'); return false; }
+    var res = S.saveExtra(KEY, { text: text, at: new Date().toISOString() });
+    setState(res.ok ? '已保存 · ' + new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) : '保存失败');
+    return res.ok;
+  }
+
+  if (S && S.available) {
+    var saved = S.readExtra(KEY);
+    if (saved && saved.text) {
+      ta.value = saved.text;
+      setState('已恢复上次的回答');
+    }
+  } else {
+    setState('无法保存（浏览器存储不可用）');
+  }
+
+  ta.addEventListener('input', function () {
+    setState('正在保存…');
+    clearTimeout(timer);
+    timer = setTimeout(save, 400);
+  });
+
+  document.getElementById('btn-save').addEventListener('click', function (e) {
+    clearTimeout(timer);
+    if (!save()) e.preventDefault();
+  });
+
+  document.getElementById('btn-leave').addEventListener('click', function () {
+    clearTimeout(timer);
+    save();
+  });
+
+  document.getElementById('btn-skip').addEventListener('click', function () {
+    clearTimeout(timer);
+    window.location.href = 'profile.html';
+  });
+
+  window.addEventListener('pagehide', function () {
+    clearTimeout(timer);
+    save();
+  });
+})();
+</script>
 </body>
 </html>
