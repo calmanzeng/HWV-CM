@@ -176,8 +176,9 @@
 
     if (failRes.ok) return '清理失败却返回成功（ok=true）';
     if (failRes.reason !== 'session') return '返回 reason=' + failRes.reason + '，期望 session';
-    if (!failRes.sessionKeys || failRes.sessionKeys.indexOf('hwv.flow.reviewId') === -1) {
-      return '未列出残留键：' + JSON.stringify(failRes.sessionKeys);
+    if (!failRes.sessionKeys) return '未返回 sessionKeys 字段';
+    if (failRes.sessionKeys.length !== 1 || failRes.sessionKeys[0] !== 'hwv.flow.reviewId') {
+      return 'sessionKeys 应恰好为 ["hwv.flow.reviewId"]，实际为 ' + JSON.stringify(failRes.sessionKeys);
     }
 
     // 关键补充：失败只应发生在 reviewId 上，其余三个键必须已被清理
