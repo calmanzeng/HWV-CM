@@ -17,6 +17,13 @@
     .opt { padding: 13px 15px; border: 1.5px solid var(--line); border-radius: var(--radius-md); background: var(--surface); font-size: var(--fs-base); color: var(--ink); }
     .opt .num { color: var(--primary); font-weight: 700; margin-right: 6px; }
     .written-own { margin-top: 12px; padding: 13px 15px; border: 1.5px dashed var(--primary); border-radius: var(--radius-md); color: var(--primary-dark); font-size: var(--fs-sm); text-align: center; }
+    .tab { background: none; border: none; cursor: pointer; font-family: inherit; padding: 0; }
+    .tab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+    .confirm-row { display: flex; align-items: flex-start; gap: 10px; padding: var(--sp-5); font-size: var(--fs-sm); line-height: 1.65; color: var(--ink-2); cursor: pointer; }
+    .confirm-row input { width: 20px; height: 20px; flex: 0 0 20px; margin-top: 1px; accent-color: var(--primary); cursor: pointer; }
+    .confirm-row.is-checked { color: var(--primary-dark); }
+    .save-state { margin-top: 12px; color: var(--muted); font-size: var(--fs-xs); text-align: center; }
+    .save-state.is-ok { color: var(--success); }
   </style>
 </head>
 <body>
@@ -37,9 +44,9 @@
     </div>
 
     <div class="tabs" role="tablist">
-      <a class="tab active" href="results.html#facts">事实与经过</a>
-      <a class="tab" href="results.html#views">不同理解</a>
-      <a class="tab" href="results.html#options">可选方向</a>
+      <button type="button" class="tab active" role="tab" aria-selected="true" data-target="facts">事实与经过</button>
+      <button type="button" class="tab" role="tab" aria-selected="false" data-target="views">不同理解</button>
+      <button type="button" class="tab" role="tab" aria-selected="false" data-target="options">可选方向</button>
     </div>
 
     <section class="card result-block block" id="facts">
@@ -75,6 +82,14 @@
       <div class="written-own">＋ 写下你自己的方向</div>
     </section>
 
+    <section class="card block" style="margin-top:14px">
+      <label class="confirm-row" id="confirm-row">
+        <input type="checkbox" id="confirm-result">
+        <span>我确认这份整理结果贴近我的体验。确认后才会标记「本人已确认」，也才会进入回顾与约定。</span>
+      </label>
+      <p class="save-state" id="result-save-state" aria-live="polite"></p>
+    </section>
+
     <div class="actions">
       <a class="btn btn-primary btn-block" href="agreement.html">我愿意试试一个约定</a>
       <a class="btn btn-soft btn-block" href="reflect.html">先不约定，去回顾成长</a>
@@ -90,5 +105,77 @@
     <a class="tab-item" href="reflect.html"><svg viewBox="0 0 24 24"><path d="M5 9h14v11H5zM6 3v4m12-4v4M8 14h3m-3 3h7"/></svg>成长</a>
   </nav>
 </div>
+<script src="store.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  var panels = {
+    facts: document.getElementById('facts'),
+    views: document.getElementById('views'),
+    options: document.getElementById('options')
+  };
+
+  function activate(key) {
+    tabs.forEach(function (t) {
+      var on = t.getAttribute('data-target') === key;
+      t.classList.toggle('active', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    Object.keys(panels).forEach(function (k) {
+      if (panels[k]) panels[k].style.display = k === key ? '' : 'none';
+    });
+  }
+
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () {
+      activate(t.getAttribute('data-target'));
+    });
+  });
+
+  var S = window.HWVStore;
+  var box = document.getElementById('confirm-result');
+  var row = document.getElementById('confirm-row');
+  var stateEl = document.getElementById('result-save-state');
+
+  function setState(text, kind) {
+    stateEl.textContent = text || '';
+    stateEl.className = 'save-state' + (kind ? ' is-' + kind : '');
+  }
+
+  if (!S || !S.available) {
+    setState('当前浏览器无法保存，这份整理结果在离开后将丢失。', '');
+    box.disabled = true;
+    return;
+  }
+
+  var existing = S.read().results;
+  if (!existing) {
+    S.saveResults({ generatedAt: new Date().toISOString(), confirmed: false });
+    setState('整理结果已保存到本机');
+  } else {
+    if (existing.data && existing.data.confirmed) {
+      box.checked = true;
+      row.classList.add('is-checked');
+      setState('已标记「本人已确认」');
+    } else {
+      setState('整理结果已保存在本机，尚未本人确认');
+    }
+  }
+
+  box.addEventListener('change', function () {
+    row.classList.toggle('is-checked', box.checked);
+    var current = S.read().results;
+    var generatedAt = (current && current.data && current.data.generatedAt) || new Date().toISOString();
+    var res = S.saveResults({ generatedAt: generatedAt, confirmed: box.checked });
+    if (!res.ok) {
+      setState('未能保存确认状态', '');
+      return;
+    }
+    setState(box.checked ? '已标记「本人已确认」' : '已取消确认');
+  });
+})();
+</script>
 </body>
 </html>
