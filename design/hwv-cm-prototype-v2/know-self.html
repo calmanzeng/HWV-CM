@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="dsh-design" content="app">
+  <title>认识自己 · HWV-CM 人文关怀版</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    .q-progress { display: flex; align-items: center; justify-content: space-between; margin: 20px 0 6px; color: var(--muted); font-size: var(--fs-xs); }
+    .q-card { padding: 24px 20px; text-align: left; }
+    .q-card .no { color: var(--primary); font-size: var(--fs-xs); font-weight: 600; letter-spacing: .06em; }
+    .q-card h2 { margin-top: 8px; font-size: var(--fs-xl); line-height: 1.4; font-weight: 700; }
+    .q-card .hint { margin-top: 10px; color: var(--muted); font-size: var(--fs-sm); line-height: 1.6; }
+    .q-card .form-field { margin-top: 18px; }
+    .skip-row { display: flex; justify-content: space-between; margin-top: 14px; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="statusbar"><span>9:41</span><span class="sb-icons">▂▄▆ ▮</span></div>
+  <header class="topbar">
+    <a class="back" href="home.html"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>返回</a>
+    <span class="topbar-title">认识自己</span>
+    <a class="link" href="profile.html" style="min-height:44px;display:flex;align-items:center">我的档案</a>
+  </header>
+  <main class="content">
+    <div class="eyebrow">个人探索 · 一次一问</div>
+    <h1 class="page-title">慢慢来，不着急</h1>
+    <p class="page-lede">这里没有标准答案，也没有对错。你可以跳过任何问题，写下的内容只属于你，随时可以保存或修改。</p>
+
+    <div class="q-progress"><span>问题 1 / 18</span><span>已保存 · 随时可继续</span></div>
+    <div class="steps">
+      <span class="step-dot current"></span><span class="step-dot"></span><span class="step-dot"></span><span class="step-dot"></span><span class="step-dot"></span>
+    </div>
+
+    <section class="card q-card">
+      <div class="no">第 1 问</div>
+      <h2>一个人失约但有充分理由时，你最在乎道歉、补救，还是今后提前通知？</h2>
+      <p class="hint">没有"应该选哪个"。试着写下你真实的感受，就是这一问的全部意义。</p>
+      <div class="form-field">
+        <label for="a1">我的想法</label>
+        <textarea class="textarea" id="a1" placeholder="例如：我更在乎提前通知，因为那让我觉得被尊重……"></textarea>
+      </div>
+      <div class="skip-row">
+        <span class="link">跳过这一问</span>
+        <span class="pill">默认私密</span>
+      </div>
+    </section>
+
+    <div class="actions">
+      <a class="btn btn-primary btn-block" href="know-self.html">保存并继续</a>
+      <a class="btn btn-quiet btn-block" href="home.html">暂时离开，已自动保存</a>
+    </div>
+    <p class="footer-note">你的回答只保存在本机，不会用于任何评分或与他人比较。</p>
+  </main>
+  <nav class="tabbar" aria-label="主导航">
+    <a class="tab-item" href="home.html"><svg viewBox="0 0 24 24"><path d="m3.5 10.5 8.5-7 8.5 7v9a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg>首页</a>
+    <a class="tab-item active" href="know-self.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3.2"/><path d="M5.5 20c.5-3.4 2.7-5.2 6.5-5.2s6 1.8 6.5 5.2"/></svg>认识自己</a>
+    <a class="tab-item" href="understand.html"><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="15" r="3"/><path d="M10.2 11.2 13.8 13.8"/></svg>理解彼此</a>
+    <a class="tab-item" href="event-start.html"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h4"/></svg>一件事</a>
+    <a class="tab-item" href="reflect.html"><svg viewBox="0 0 24 24"><path d="M5 9h14v11H5zM6 3v4m12-4v4M8 14h3m-3 3h7"/></svg>成长</a>
+  </nav>
+</div>
+</body>
+</html>
