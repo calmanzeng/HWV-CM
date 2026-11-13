@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="dsh-design" content="app">
+  <title>写下经过 · HWV-CM 人文关怀版</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    .flow { margin-top: 18px; }
+    .form-card { margin-top: 14px; padding: var(--sp-5); display: grid; gap: 16px; }
+    .form-card .q-no { color: var(--primary); font-size: var(--fs-xs); font-weight: 600; letter-spacing: .06em; }
+    .form-card .q-title { margin-top: 4px; font-size: var(--fs-md); font-weight: 600; line-height: 1.45; }
+    .sep-legend { margin-top: 14px; padding: 12px 14px; border-radius: var(--radius-md); background: var(--primary-soft); color: var(--primary-dark); font-size: var(--fs-sm); line-height: 1.65; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="statusbar"><span>9:41</span><span class="sb-icons">▂▄▆ ▮</span></div>
+  <header class="topbar">
+    <a class="back" href="event-start.html"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>返回</a>
+    <span class="topbar-title">写下经过</span>
+    <a class="link" href="home.html" style="min-height:44px;display:flex;align-items:center">退出</a>
+  </header>
+  <main class="content">
+    <div class="eyebrow">事件梳理 · 私密叙述</div>
+    <h1 class="page-title">先把发生的事，分开写</h1>
+    <p class="page-lede">不用写得好，也不用写得全。只记录你愿意整理的部分，不确定的地方可以写「我不知道」。</p>
+
+    <div class="steps flow">
+      <span class="step-dot done"></span><span class="step-dot done"></span><span class="step-dot current"></span><span class="step-dot"></span><span class="step-dot"></span><span class="step-dot"></span><span class="step-dot"></span>
+    </div>
+
+    <section class="card form-card">
+      <div>
+        <div class="q-no">01 · 可以核对的事实</div>
+        <p class="q-title">有哪些事情是你亲自看到、听到或可以核对的？</p>
+        <div class="form-field" style="margin-top:10px">
+          <textarea class="textarea" id="facts" placeholder="例如：我们约好 18:00 见面，对方 18:30 到达。只写你能确认的部分。"></textarea>
+        </div>
+      </div>
+      <div>
+        <div class="q-no">02 · 争议或未知</div>
+        <p class="q-title">哪些内容还有争议，或你还不确定？</p>
+        <div class="form-field" style="margin-top:10px">
+          <textarea class="textarea" id="disputed" placeholder="把双方说法不一致的地方标出来，也可以写「我不知道」。"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="card form-card">
+      <div>
+        <div class="q-no">03 · 我当时的感受与需要</div>
+        <p class="q-title">你当时的感受是什么？你在意的是什么？</p>
+        <div class="form-field" style="margin-top:10px">
+          <textarea class="textarea" id="feelings" placeholder="尽量写具体的感受，例如：失落、被忽略、担心……"></textarea>
+        </div>
+        <div class="form-field" style="margin-top:12px">
+          <textarea class="textarea" id="needs" placeholder="我在意的需要：被尊重、安全感、可预期……也可以留空"></textarea>
+        </div>
+      </div>
+      <div>
+        <div class="q-no">04 · 我的解释（不是事实）</div>
+        <p class="q-title">你怎样理解对方的行为？这只是你的理解。</p>
+        <div class="form-field" style="margin-top:10px">
+          <textarea class="textarea" id="interpretation" placeholder="例如：「我把迟到理解为不被重视。」这不等同于对方的真实动机。"></textarea>
+        </div>
+      </div>
+      <div class="sep-legend">
+        写完后会请你分辨：哪些是「我看到的事实」，哪些是「我的解释」——两者分开，是这一步的全部意义。
+      </div>
+    </section>
+
+    <div class="actions">
+      <a class="btn btn-primary btn-block" href="possibilities.html">写好了，继续</a>
+      <a class="btn btn-quiet btn-block" href="home.html">先保存，稍后再写</a>
+    </div>
+    <p class="footer-note">记录只保存在本机；「感受与需要」会作为你叙述的一部分被保留，不会被当作事实或评分依据。</p>
+  </main>
+  <nav class="tabbar" aria-label="主导航">
+    <a class="tab-item" href="home.html"><svg viewBox="0 0 24 24"><path d="m3.5 10.5 8.5-7 8.5 7v9a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg>首页</a>
+    <a class="tab-item" href="know-self.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3.2"/><path d="M5.5 20c.5-3.4 2.7-5.2 6.5-5.2s6 1.8 6.5 5.2"/></svg>认识自己</a>
+    <a class="tab-item" href="understand.html"><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="15" r="3"/><path d="M10.2 11.2 13.8 13.8"/></svg>理解彼此</a>
+    <a class="tab-item active" href="event-start.html"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h4"/></svg>一件事</a>
+    <a class="tab-item" href="reflect.html"><svg viewBox="0 0 24 24"><path d="M5 9h14v11H5zM6 3v4m12-4v4M8 14h3m-3 3h7"/></svg>成长</a>
+  </nav>
+</div>
+</body>
+</html>
