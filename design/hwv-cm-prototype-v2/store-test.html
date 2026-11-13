@@ -17,7 +17,7 @@
 </head>
 <body>
 <h1>HWV-CM 原型 v2 · store.js 行为断言</h1>
-<p class="warn">本页会清空本机该原型的数据（局部清理 localStorage 与 sessionStorage 中的 hwv.* 键）。请先用独立浏览器配置，或先导出备份。</p>
+<p class="warn">本页仅清理 <code>hwv.</code> 前缀的键，不会动其他站点数据。建议先用独立浏览器配置或先导出备份。</p>
 <p>把本文件与 <code>store.js</code> 放在同一目录后打开，全部断言在页面内执行，不联网。</p>
 <ol id="out"></ol>
 <p id="sum"></p>
@@ -53,7 +53,22 @@
     return;
   }
 
-  try { localStorage.clear(); sessionStorage.clear(); } catch (e) {}
+  function clearHwvOnly() {
+    var i, k;
+    try {
+      for (i = localStorage.length - 1; i >= 0; i--) {
+        k = localStorage.key(i);
+        if (k && k.indexOf('hwv.') === 0) localStorage.removeItem(k);
+      }
+    } catch (e) {}
+    try {
+      for (i = sessionStorage.length - 1; i >= 0; i--) {
+        k = sessionStorage.key(i);
+        if (k && k.indexOf('hwv.') === 0) sessionStorage.removeItem(k);
+      }
+    } catch (e) {}
+  }
+  clearHwvOnly();
 
   check('存储可用', function () { return S.available === true || 'localStorage 不可用（若在隐私模式，此项失败属预期）'; });
   check('初始无内容', function () { return S.hasContent() === false; });
@@ -88,6 +103,24 @@
   S.saveExtra('knowSelf.q1', { text: '只有这一条回答' });
   check('仅 extra 有内容时 hasContent 应为 true（导出前置条件）', function () {
     return S.hasContent() === true || '当前为 false：这类记录会被导出按钮判为「没有记录」';
+  });
+
+  check('只填 extra 后保存空事件，extra 不能被删掉', function () {
+    S.clearAll();
+    S.saveExtra('knowSelf.q1', { text: '不该消失的回答' });
+    S.saveEvent({ facts: '', disputed: '', feelings: '', needs: '', interpretation: '' });
+    var got = S.readExtra('knowSelf.q1');
+    return !!(got && got.text === '不该消失的回答') || 'extra 已丢失：' + JSON.stringify(got);
+  });
+
+  check('空事件保存后存储键仍存在（因为有 extra）', function () {
+    return localStorage.getItem('hwv.v2.state') !== null || '存储键被整键删除';
+  });
+
+  check('完全无内容时空事件仍应清除存储键', function () {
+    S.clearAll();
+    S.saveEvent({ facts: '   ', disputed: '', feelings: '', needs: '', interpretation: '' });
+    return localStorage.getItem('hwv.v2.state') === null || '应当清键但未清除';
   });
 
   try { sessionStorage.setItem('hwv.flow.reviewId', 'x'); sessionStorage.setItem('hwv.flow.agreementId', 'y'); } catch (e) {}
