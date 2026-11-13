@@ -19,6 +19,9 @@
     .h-actions .form-field { grid-column: 1 / -1; }
     .revise { margin-top: 12px; display: grid; gap: 8px; }
     .confirm-note { margin-top: 18px; }
+    .h-actions .form-field[hidden] { display: none; }
+    .notice { margin-top: 12px; color: var(--danger); font-size: var(--fs-sm); line-height: 1.6; }
+    .notice:empty { display: none; }
   </style>
 </head>
 <body>
@@ -42,11 +45,11 @@
       <h3>这次事件里，什么需要对我比较重要？</h3>
       <p class="basis">你写下的需要是：「被尊重与可预期」。这是否贴近你的体验？</p>
       <p class="unknown">缺席方的感受、需要与动机仍未知——除非对方亲自说明。</p>
-      <div class="h-actions">
-        <button class="act sel" type="button"><span class="r"></span>贴近我的体验</button>
-        <button class="act" type="button"><span class="r"></span>不完全贴切，我想修改</button>
-        <div class="form-field" style="display:none"><textarea class="textarea" placeholder="写下更贴切的表达……"></textarea></div>
-        <button class="act" type="button"><span class="r"></span>保留为未知，不整理</button>
+      <div class="h-actions" data-hyp="self">
+        <button class="act" type="button" data-choice="fit"><span class="r"></span>贴近我的体验</button>
+        <button class="act" type="button" data-choice="revise"><span class="r"></span>不完全贴切，我想修改</button>
+        <div class="form-field" hidden><textarea class="textarea" id="rev-self" placeholder="写下更贴切的表达……"></textarea></div>
+        <button class="act" type="button" data-choice="unknown"><span class="r"></span>保留为未知，不整理</button>
       </div>
     </section>
 
@@ -54,20 +57,21 @@
       <h3>我的解释，是否准确表达了当时的理解？</h3>
       <p class="basis">你写下的解释是：「把迟到理解为不被重视」。它是你的理解，不是对他人动机的证明。</p>
       <p class="unknown">对方当时的原因与意图，除非本人说明，否则未知。</p>
-      <div class="h-actions">
-        <button class="act" type="button"><span class="r"></span>这是我的理解</button>
-        <button class="act" type="button"><span class="r"></span>不完全贴切，我想修改</button>
-        <div class="form-field" style="display:none"><textarea class="textarea" placeholder="写下更贴切的表达……"></textarea></div>
-        <button class="act sel" type="button"><span class="r"></span>保留为未知，不整理</button>
+      <div class="h-actions" data-hyp="meaning">
+        <button class="act" type="button" data-choice="fit"><span class="r"></span>这是我的理解</button>
+        <button class="act" type="button" data-choice="revise"><span class="r"></span>不完全贴切，我想修改</button>
+        <div class="form-field" hidden><textarea class="textarea" id="rev-meaning" placeholder="写下更贴切的表达……"></textarea></div>
+        <button class="act" type="button" data-choice="unknown"><span class="r"></span>保留为未知，不整理</button>
       </div>
     </section>
 
     <div class="callout confirm-note">
       <span>只有当你确认上面的说法（或明确保留为未知）后，才会生成三份整理结果。修改后的内容会标记为你本人的修订。</span>
     </div>
+    <p class="notice" id="confirm-notice" aria-live="polite"></p>
 
     <div class="actions">
-      <a class="btn btn-primary btn-block" href="results.html">我确认过了，生成整理结果</a>
+      <a class="btn btn-primary btn-block" href="results.html" id="btn-confirm">我确认过了，生成整理结果</a>
       <a class="btn btn-quiet btn-block" href="write-down.html">回上一步修改叙述</a>
     </div>
   </main>
@@ -79,5 +83,108 @@
     <a class="tab-item" href="reflect.html"><svg viewBox="0 0 24 24"><path d="M5 9h14v11H5zM6 3v4m12-4v4M8 14h3m-3 3h7"/></svg>成长</a>
   </nav>
 </div>
+<script src="store.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var S = window.HWVStore;
+  var KEY = 'possibilities';
+  var notice = document.getElementById('confirm-notice');
+  var groups = Array.prototype.slice.call(document.querySelectorAll('.h-actions'));
+  var state = { self: null, meaning: null };
+
+  function say(text) { notice.textContent = text || ''; }
+
+  function valid(entry) {
+    if (!entry || !entry.choice) return false;
+    if (entry.choice === 'revise') return !!(entry.text && entry.text.trim());
+    return true;
+  }
+
+  function paint(hyp) {
+    var group = document.querySelector('.h-actions[data-hyp="' + hyp + '"]');
+    if (!group) return;
+    var current = state[hyp];
+    var choice = current ? current.choice : null;
+    Array.prototype.slice.call(group.querySelectorAll('.act')).forEach(function (btn) {
+      btn.classList.toggle('sel', btn.getAttribute('data-choice') === choice);
+    });
+    var field = group.querySelector('.form-field');
+    var area = group.querySelector('textarea');
+    if (field) field.hidden = choice !== 'revise';
+    if (area && current && typeof current.text === 'string' && area.value !== current.text) {
+      area.value = current.text;
+    }
+  }
+
+  function persist() {
+    if (!S || !S.available) return false;
+    var res = S.saveExtra(KEY, state);
+    return !!(res && res.ok);
+  }
+
+  groups.forEach(function (group) {
+    var hyp = group.getAttribute('data-hyp');
+    var area = group.querySelector('textarea');
+
+    Array.prototype.slice.call(group.querySelectorAll('.act')).forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var choice = btn.getAttribute('data-choice');
+        state[hyp] = { choice: choice, text: area ? area.value : '' };
+        say('');
+        paint(hyp);
+        if (!persist()) say('刚才的选择没能保存到本机，你可以再点一次。');
+      });
+    });
+
+    if (area) {
+      area.addEventListener('input', function () {
+        if (!state[hyp]) state[hyp] = { choice: 'revise', text: '' };
+        state[hyp].text = area.value;
+        say('');
+        persist();
+      });
+    }
+  });
+
+  if (S && S.available) {
+    var saved = S.readExtra(KEY);
+    if (saved && typeof saved === 'object') {
+      if (saved.self) state.self = saved.self;
+      if (saved.meaning) state.meaning = saved.meaning;
+    }
+  }
+  paint('self');
+  paint('meaning');
+
+  document.getElementById('btn-confirm').addEventListener('click', function (e) {
+    var reviseEmpty = false;
+    ['self', 'meaning'].forEach(function (h) {
+      var entry = state[h];
+      if (entry && entry.choice === 'revise' && !(entry.text && entry.text.trim())) reviseEmpty = true;
+    });
+    if (reviseEmpty) {
+      e.preventDefault();
+      say('你有一条假设选了「我想修改」，但修改内容还是空的。请写一句，或改选「保留为未知」。');
+      return;
+    }
+
+    if (!valid(state.self) || !valid(state.meaning)) {
+      e.preventDefault();
+      say('请先为两条假设分别做出选择。选「保留为未知」也算明确的选择。');
+      return;
+    }
+
+    if (!persist()) {
+      e.preventDefault();
+      say('当前无法把选择保存到本机，先不生成整理结果。请检查浏览器存储后再试。');
+      return;
+    }
+
+    say('');
+  });
+})();
+</script>
 </body>
 </html>
