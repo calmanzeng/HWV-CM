@@ -118,7 +118,22 @@
         merged[k] = typeof patch[k] === 'string' ? patch[k] : '';
       });
       merged.updatedAt = new Date().toISOString();
-      s.event = merged;
+
+      var keys = ['facts', 'disputed', 'feelings', 'needs', 'interpretation'];
+      var hasAny = keys.some(function (k) {
+        return typeof merged[k] === 'string' && merged[k].trim();
+      });
+
+      if (!hasAny) {
+        s.event = null;
+        if (!s.results && !s.observations.length && !s.agreements.length) {
+          try { if (box) box.removeItem(KEY); } catch (e) {}
+          notify(blank());
+          return { ok: true, reason: 'empty', state: blank() };
+        }
+      } else {
+        s.event = merged;
+      }
       return write(s);
     },
 
@@ -130,8 +145,16 @@
 
     addObservation: function (text, confirmed) {
       var s = read();
+      var value = String(text || '').trim();
+      if (!value) return { ok: false, reason: 'empty', state: s };
+
+      var dup = s.observations.some(function (o) {
+        return o && o.text === value && !!o.confirmed === !!confirmed;
+      });
+      if (dup) return { ok: true, reason: 'duplicate', state: s };
+
       s.observations.push({
-        text: String(text || ''),
+        text: value,
         confirmed: !!confirmed,
         at: new Date().toISOString()
       });
