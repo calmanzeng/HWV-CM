@@ -182,12 +182,23 @@
       return write(s);
     },
 
-    addAgreement: function (data) {
+    addAgreement: function (data, options) {
       var s = read();
       var d = data || {};
-      if (!d.agenda || !String(d.agenda).trim()) return { ok: false, reason: 'empty', state: s };
+      var agenda = String(d.agenda || '').trim();
+      if (!agenda) return { ok: false, reason: 'empty', state: s };
+
+      var opts = options || {};
+      var id = opts.id ? String(opts.id) : null;
+
+      if (id) {
+        var dup = s.agreements.some(function (a) { return a && a.id === id; });
+        if (dup) return { ok: true, reason: 'duplicate', state: s };
+      }
+
       s.agreements.push({
-        agenda: String(d.agenda),
+        id: id || ('agr-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8)),
+        agenda: agenda,
         action: String(d.action || ''),
         reviewAt: String(d.reviewAt || ''),
         at: new Date().toISOString()
@@ -249,6 +260,7 @@
           results: s.results,
           observations: s.observations,
           agreements: s.agreements,
+          extra: s.extra,
           createdAt: s.createdAt,
           updatedAt: s.updatedAt
         }
