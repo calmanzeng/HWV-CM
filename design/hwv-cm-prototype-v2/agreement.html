@@ -119,6 +119,7 @@
   }
 
   window.addEventListener('pageshow', function (ev) {
+    btn.removeAttribute('data-done');
     if (ev.persisted) return;
     submitting = false;
     submitId = null;
