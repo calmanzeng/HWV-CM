@@ -14,6 +14,29 @@
     .safety-title { display: flex; align-items: center; gap: 8px; font-size: var(--fs-md); font-weight: 600; }
     .safety-title svg { width: 20px; height: 20px; stroke: var(--warning); fill: none; stroke-width: 1.8; stroke-linecap: round; }
     .options { display: grid; gap: 10px; margin-top: 14px; }
+
+    .consent-check {
+      display: flex; align-items: flex-start; gap: 10px;
+      margin-top: 16px; padding: 13px 14px;
+      border: 1.5px solid var(--line); border-radius: var(--radius-md);
+      background: var(--surface-warm); cursor: pointer;
+      font-size: var(--fs-sm); line-height: 1.6; color: var(--ink-2);
+    }
+    .consent-check input {
+      width: 20px; height: 20px; flex: 0 0 20px; margin-top: 1px;
+      accent-color: var(--primary); cursor: pointer;
+    }
+    .consent-check.is-checked { border-color: var(--primary); background: var(--primary-soft); color: var(--primary-dark); }
+
+    .btn[disabled], .option[disabled] { opacity: .45; cursor: not-allowed; box-shadow: none; }
+    .btn[disabled]:active, .option[disabled]:active { transform: none; }
+    .option[aria-pressed="true"] { border-color: var(--primary); background: var(--primary-soft); }
+    .option[aria-pressed="true"] .radio { border-color: var(--primary); }
+    .option[aria-pressed="true"] .radio::after { background: var(--primary); }
+
+    .gate-note { margin-top: 12px; color: var(--muted); font-size: var(--fs-xs); line-height: 1.6; }
+    .gate-callout { margin-bottom: 16px; }
+    .safety-block[hidden], .gate-callout[hidden], .gate-note[hidden] { display: none; }
   </style>
 </head>
 <body>
@@ -29,6 +52,10 @@
     <h1 class="page-title">先看看这里安不安全</h1>
     <p class="page-lede">梳理一次具体经历，不是判对错，也不是逼你和解。开始前，请先确认两件事：你知道了什么，以及你此刻是否安全。</p>
 
+    <div class="callout callout-warm gate-callout" id="gate-callout" hidden>
+      <span>为确认你此刻是否安全，需要先在这里完成一次安全检查。这一步不能跳过，也不会替你判断。</span>
+    </div>
+
     <section class="card consent">
       <h2>开始之前，请了解</h2>
       <ul>
@@ -37,22 +64,32 @@
         <li>系统整理的内容只是「待验证的假设」，不是事实，也不是对对方动机的判断。</li>
         <li>任何一步都不会要求你联系对方或达成和解。</li>
       </ul>
+
+      <label class="consent-check" id="consent-label">
+        <input type="checkbox" id="consent-check">
+        <span>我已了解以上说明，并愿意继续。</span>
+      </label>
+
       <div class="actions">
-        <a class="btn btn-primary btn-block" href="event-start.html#safety-1">我了解，继续</a>
+        <button type="button" class="btn btn-primary btn-block" id="btn-consent" disabled>我了解，继续</button>
         <a class="btn btn-quiet btn-block" href="home.html">暂时不开始</a>
       </div>
+      <p class="gate-note" id="storage-note" hidden>当前浏览器不允许会话存储，安全检查无法进行。请换用支持会话存储的浏览器（如 Chrome、Edge）打开本原型。</p>
     </section>
 
-    <section class="safety-block" id="safety-1">
+    <section class="safety-block" id="safety-1" hidden>
       <div class="safety-title">
         <svg viewBox="0 0 24 24"><path d="M12 3 21 19H3L12 3Zm0 7v4m0 3h.01"/></svg>
         <span>安全检查 · 此刻的你</span>
       </div>
       <p class="section-note" style="margin-top:6px">哪一句更贴近你的情况？如实选择就好，没有标准答案。</p>
-      <div class="options">
-        <a class="option selected" href="write-down.html"><span class="radio"></span>我现在可以安全地整理这件事</a>
-        <a class="option" href="safety.html"><span class="radio"></span>我有一些担忧或不确定</a>
-        <a class="option" href="safety.html"><span class="radio"></span>我现在不想继续（可以随时回来）</a>
+      <div class="options" role="group" aria-label="安全检查选项">
+        <button type="button" class="option" data-safety="safe" aria-pressed="false"><span class="radio"></span>我现在可以安全地整理这件事</button>
+        <button type="button" class="option" data-safety="worried" aria-pressed="false"><span class="radio"></span>我有一些担忧或不确定</button>
+        <button type="button" class="option" data-safety="stop" aria-pressed="false"><span class="radio"></span>我现在不想继续（可以随时回来）</button>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn btn-primary btn-block" id="btn-safety" disabled>请先选择一项</button>
       </div>
       <div class="callout callout-warn" style="margin-top:14px">
         <span>选择「有担忧或不确定」或「不想继续」时，流程会先停在安全支持页，不会推进到下一步。</span>
@@ -71,5 +108,131 @@
     <a class="tab-item" href="reflect.html"><svg viewBox="0 0 24 24"><path d="M5 9h14v11H5zM6 3v4m12-4v4M8 14h3m-3 3h7"/></svg>成长</a>
   </nav>
 </div>
+<script>
+(function () {
+  'use strict';
+
+  var SAFETY_KEY = 'hwv.flow.safety';
+  var CONSENT_KEY = 'hwv.flow.consent';
+  var VALUES = ['safe', 'worried', 'stop'];
+  var LABELS = {
+    safe: '继续，写下经过',
+    worried: '先看安全支持',
+    stop: '先看安全支持'
+  };
+
+  var consentCheck = document.getElementById('consent-check');
+  var consentLabel = document.getElementById('consent-label');
+  var btnConsent = document.getElementById('btn-consent');
+  var safetyBlock = document.getElementById('safety-1');
+  var btnSafety = document.getElementById('btn-safety');
+  var options = Array.prototype.slice.call(safetyBlock.querySelectorAll('.option[data-safety]'));
+  var gateCallout = document.getElementById('gate-callout');
+  var storageNote = document.getElementById('storage-note');
+
+  var storage = (function () {
+    try {
+      window.sessionStorage.setItem('hwv.probe', '1');
+      window.sessionStorage.removeItem('hwv.probe');
+      return window.sessionStorage;
+    } catch (e) {
+      return null;
+    }
+  })();
+
+  var selected = null;
+
+  function get(key) {
+    try { return storage ? storage.getItem(key) : null; } catch (e) { return null; }
+  }
+  function set(key, value) {
+    try { if (storage) storage.setItem(key, value); } catch (e) {}
+  }
+  function clear(key) {
+    try { if (storage) storage.removeItem(key); } catch (e) {}
+  }
+
+  function setSelected(value) {
+    selected = value;
+    options.forEach(function (opt) {
+      opt.setAttribute('aria-pressed', opt.getAttribute('data-safety') === value ? 'true' : 'false');
+    });
+    if (value) {
+      btnSafety.disabled = false;
+      btnSafety.textContent = LABELS[value];
+    } else {
+      btnSafety.disabled = true;
+      btnSafety.textContent = '请先选择一项';
+    }
+  }
+
+  function markConsentDone() {
+    consentCheck.checked = true;
+    consentLabel.classList.add('is-checked');
+    btnConsent.disabled = true;
+    btnConsent.textContent = '已了解';
+  }
+
+  function revealSafety(prefill) {
+    safetyBlock.hidden = false;
+    if (prefill) setSelected(prefill);
+  }
+
+  if (!storage) {
+    storageNote.hidden = false;
+    consentCheck.disabled = true;
+    btnConsent.disabled = true;
+    return;
+  }
+
+  var params = new URLSearchParams(window.location.search);
+
+  if (params.get('reset') === '1') {
+    clear(SAFETY_KEY);
+    clear(CONSENT_KEY);
+  }
+  if (params.get('need-safety') === '1') {
+    gateCallout.hidden = false;
+  }
+  if (params.toString()) {
+    try { history.replaceState(null, '', window.location.pathname); } catch (e) {}
+  }
+
+  var savedConsent = get(CONSENT_KEY) === '1';
+  var savedSafety = get(SAFETY_KEY);
+  if (VALUES.indexOf(savedSafety) === -1) savedSafety = null;
+
+  if (savedConsent) {
+    markConsentDone();
+    revealSafety(savedSafety);
+  }
+
+  consentCheck.addEventListener('change', function () {
+    consentLabel.classList.toggle('is-checked', consentCheck.checked);
+    btnConsent.disabled = !consentCheck.checked;
+  });
+
+  btnConsent.addEventListener('click', function () {
+    if (!consentCheck.checked) return;
+    set(CONSENT_KEY, '1');
+    markConsentDone();
+    revealSafety(null);
+    safetyBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    try { options[0].focus({ preventScroll: true }); } catch (e) { options[0].focus(); }
+  });
+
+  options.forEach(function (opt) {
+    opt.addEventListener('click', function () {
+      setSelected(opt.getAttribute('data-safety'));
+    });
+  });
+
+  btnSafety.addEventListener('click', function () {
+    if (!selected) return;
+    set(SAFETY_KEY, selected);
+    window.location.href = selected === 'safe' ? 'write-down.html' : 'safety.html';
+  });
+})();
+</script>
 </body>
 </html>
