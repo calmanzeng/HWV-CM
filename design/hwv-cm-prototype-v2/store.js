@@ -243,20 +243,50 @@
         notify(blank());
         return { ok: false, reason: 'unavailable' };
       }
+
       try {
         box.removeItem(KEY);
       } catch (e) {
         return { ok: false, reason: 'error' };
       }
+      if (box.getItem(KEY) !== null) {
+        return { ok: false, reason: 'error' };
+      }
+
+      var sessionKeys = [
+        'hwv.flow.safety',
+        'hwv.flow.consent',
+        'hwv.flow.reviewId',
+        'hwv.flow.agreementId'
+      ];
+      var i;
+      var sessionUsable = true;
+
       try {
-        global.sessionStorage.removeItem('hwv.flow.safety');
-        global.sessionStorage.removeItem('hwv.flow.consent');
-        global.sessionStorage.removeItem('hwv.flow.reviewId');
-        global.sessionStorage.removeItem('hwv.flow.agreementId');
-      } catch (e) {}
-      var empty = box.getItem(KEY) === null;
+        global.sessionStorage.setItem('hwv.probe', '1');
+        global.sessionStorage.removeItem('hwv.probe');
+      } catch (e) {
+        sessionUsable = false;
+      }
+
+      if (sessionUsable) {
+        for (i = 0; i < sessionKeys.length; i++) {
+          try { global.sessionStorage.removeItem(sessionKeys[i]); } catch (e) {}
+        }
+        var left = [];
+        for (i = 0; i < sessionKeys.length; i++) {
+          var remains = null;
+          try { remains = global.sessionStorage.getItem(sessionKeys[i]); } catch (e) { remains = 'unreadable'; }
+          if (remains !== null) left.push(sessionKeys[i]);
+        }
+        if (left.length) {
+          notify(blank());
+          return { ok: false, reason: 'session', sessionKeys: left };
+        }
+      }
+
       notify(blank());
-      return { ok: empty, reason: empty ? 'deleted' : 'error' };
+      return { ok: true, reason: 'deleted' };
     },
 
     sizeBytes: function () {
