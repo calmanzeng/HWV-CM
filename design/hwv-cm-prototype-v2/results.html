@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="dsh-design" content="app">
+  <title>三份整理结果 · HWV-CM 人文关怀版</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    .flow { margin-top: 18px; }
+    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 16px; padding: 5px; background: var(--surface-muted); border-radius: var(--radius-md); }
+    .tab { display: flex; align-items: center; justify-content: center; min-height: 40px; border-radius: 10px; color: var(--muted); font-size: var(--fs-sm); font-weight: 600; }
+    .tab.active { background: var(--surface); color: var(--primary-dark); box-shadow: var(--shadow-soft); }
+    .block { margin-top: 12px; }
+    .block ul { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 6px; color: var(--ink-2); font-size: var(--fs-base); line-height: 1.7; }
+    .opt-list { display: grid; gap: 10px; margin-top: 12px; }
+    .opt { padding: 13px 15px; border: 1.5px solid var(--line); border-radius: var(--radius-md); background: var(--surface); font-size: var(--fs-base); color: var(--ink); }
+    .opt .num { color: var(--primary); font-weight: 700; margin-right: 6px; }
+    .written-own { margin-top: 12px; padding: 13px 15px; border: 1.5px dashed var(--primary); border-radius: var(--radius-md); color: var(--primary-dark); font-size: var(--fs-sm); text-align: center; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="statusbar"><span>9:41</span><span class="sb-icons">▂▄▆ ▮</span></div>
+  <header class="topbar">
+    <a class="back" href="possibilities.html"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>返回</a>
+    <span class="topbar-title">三份整理结果</span>
+    <a class="link" href="home.html" style="min-height:44px;display:flex;align-items:center">保存</a>
+  </header>
+  <main class="content">
+    <div class="eyebrow">事件梳理 · 整理结果</div>
+    <h1 class="page-title">这是给你的，不是给你的判决</h1>
+    <p class="page-lede">下面三份材料帮你重新看见这件事。它们基于你的叙述，所有推断都标记为「待验证假设」。</p>
+
+    <div class="steps flow">
+      <span class="step-dot done"></span><span class="step-dot done"></span><span class="step-dot done"></span><span class="step-dot done"></span><span class="step-dot done"></span><span class="step-dot current"></span>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <a class="tab active" href="results.html#facts">事实与经过</a>
+      <a class="tab" href="results.html#views">不同理解</a>
+      <a class="tab" href="results.html#options">可选方向</a>
+    </div>
+
+    <section class="card result-block block" id="facts">
+      <span class="tag">以你的叙述为准</span>
+      <h3>事实与经过</h3>
+      <ul>
+        <li>双方约好 18:00 见面，对方 18:30 到达（你亲眼所见）。</li>
+        <li>见面后你提起了迟到，对方没有正面回应。</li>
+        <li>你无法核对的：对方迟到的原因。</li>
+      </ul>
+      <p style="font-size:var(--fs-sm);color:var(--muted)">仅收录你可以确认的内容；无法确认的部分已单列。</p>
+    </section>
+
+    <section class="card result-block block" id="views" style="display:none">
+      <span class="tag">待验证假设</span>
+      <h3>不同理解</h3>
+      <ul>
+        <li>你的需要：被尊重与可预期（你已确认贴近体验）。</li>
+        <li>你的解释：把迟到理解为不被重视（你保留为未知，未确认）。</li>
+        <li>尚未验证：对方迟到的真实原因与当时感受。</li>
+      </ul>
+    </section>
+
+    <section class="card result-block block" id="options" style="display:none">
+      <span class="tag">你可以考虑，也可以不做</span>
+      <h3>可选方向</h3>
+      <div class="opt-list">
+        <div class="opt"><span class="num">1</span>下次见面时，提前说明我对守时的在意。</div>
+        <div class="opt"><span class="num">2</span>先不处理这件事，观察一段时间。</div>
+        <div class="opt"><span class="num">3</span>把上面「待验证」的问题，留到某天愿意时再核对。</div>
+        <div class="opt"><span class="num">4</span>什么都不做——这也是一种选择。</div>
+      </div>
+      <div class="written-own">＋ 写下你自己的方向</div>
+    </section>
+
+    <div class="actions">
+      <a class="btn btn-primary btn-block" href="agreement.html">我愿意试试一个约定</a>
+      <a class="btn btn-soft btn-block" href="reflect.html">先不约定，去回顾成长</a>
+      <a class="btn btn-quiet btn-block" href="home.html">保存后离开</a>
+    </div>
+    <p class="footer-note">整理结果不是测评结论；不用于评分、排名或任何第三方用途。</p>
+  </main>
+  <nav class="tabbar" aria-label="主导航">
+    <a class="tab-item" href="home.html"><svg viewBox="0 0 24 24"><path d="m3.5 10.5 8.5-7 8.5 7v9a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg>首页</a>
+    <a class="tab-item" href="know-self.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3.2"/><path d="M5.5 20c.5-3.4 2.7-5.2 6.5-5.2s6 1.8 6.5 5.2"/></svg>认识自己</a>
+    <a class="tab-item" href="understand.html"><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="15" r="3"/><path d="M10.2 11.2 13.8 13.8"/></svg>理解彼此</a>
+    <a class="tab-item active" href="event-start.html"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h4"/></svg>一件事</a>
+    <a class="tab-item" href="reflect.html"><svg viewBox="0 0 24 24"><path d="M5 9h14v11H5zM6 3v4m12-4v4M8 14h3m-3 3h7"/></svg>成长</a>
+  </nav>
+</div>
+</body>
+</html>
