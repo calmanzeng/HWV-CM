@@ -123,7 +123,12 @@
     return localStorage.getItem('hwv.v2.state') === null || '应当清键但未清除';
   });
 
-  try { sessionStorage.setItem('hwv.flow.reviewId', 'x'); sessionStorage.setItem('hwv.flow.agreementId', 'y'); } catch (e) {}
+  try {
+    sessionStorage.setItem('hwv.flow.reviewId', 'x');
+    sessionStorage.setItem('hwv.flow.agreementId', 'y');
+    sessionStorage.setItem('hwv.flow.safety', 'safe');
+    sessionStorage.setItem('hwv.flow.consent', '1');
+  } catch (e) {}
   S.clearAll();
   check('删除后存储键为空', function () { return localStorage.getItem('hwv.v2.state') === null; });
   check('删除后会话标识一并清除', function () {
