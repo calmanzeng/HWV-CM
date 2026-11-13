@@ -30,7 +30,8 @@
       event: null,
       results: null,
       observations: [],
-      agreements: []
+      agreements: [],
+      extra: {}
     };
   }
 
@@ -44,6 +45,7 @@
     if (raw.results && typeof raw.results === 'object') base.results = raw.results;
     if (Array.isArray(raw.observations)) base.observations = raw.observations;
     if (Array.isArray(raw.agreements)) base.agreements = raw.agreements;
+    if (raw.extra && typeof raw.extra === 'object') base.extra = raw.extra;
     return base;
   }
 
@@ -127,7 +129,19 @@
       if (!hasAny) {
         s.event = null;
         if (!s.results && !s.observations.length && !s.agreements.length) {
-          try { if (box) box.removeItem(KEY); } catch (e) {}
+          if (!box) {
+            fallback = null;
+            notify(blank());
+            return { ok: false, reason: 'unavailable', state: blank() };
+          }
+          try {
+            box.removeItem(KEY);
+          } catch (e) {
+            return { ok: false, reason: 'error', state: read() };
+          }
+          if (box.getItem(KEY) !== null) {
+            return { ok: false, reason: 'error', state: read() };
+          }
           notify(blank());
           return { ok: true, reason: 'empty', state: blank() };
         }
@@ -143,22 +157,54 @@
       return write(s);
     },
 
-    addObservation: function (text, confirmed) {
+    addObservation: function (text, confirmed, options) {
       var s = read();
       var value = String(text || '').trim();
       if (!value) return { ok: false, reason: 'empty', state: s };
 
-      var dup = s.observations.some(function (o) {
-        return o && o.text === value && !!o.confirmed === !!confirmed;
-      });
-      if (dup) return { ok: true, reason: 'duplicate', state: s };
+      var opts = options || {};
+      var id = opts.id ? String(opts.id) : null;
+
+      if (id) {
+        var dup = s.observations.some(function (o) {
+          return o && o.id === id;
+        });
+        if (dup) return { ok: true, reason: 'duplicate', state: s };
+      }
 
       s.observations.push({
+        id: id || ('obs-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8)),
         text: value,
         confirmed: !!confirmed,
+        source: opts.source ? String(opts.source) : 'manual',
         at: new Date().toISOString()
       });
       return write(s);
+    },
+
+    addAgreement: function (data) {
+      var s = read();
+      var d = data || {};
+      if (!d.agenda || !String(d.agenda).trim()) return { ok: false, reason: 'empty', state: s };
+      s.agreements.push({
+        agenda: String(d.agenda),
+        action: String(d.action || ''),
+        reviewAt: String(d.reviewAt || ''),
+        at: new Date().toISOString()
+      });
+      return write(s);
+    },
+
+    saveExtra: function (key, value) {
+      var s = read();
+      s.extra = s.extra || {};
+      s.extra[key] = value;
+      return write(s);
+    },
+
+    readExtra: function (key) {
+      var s = read();
+      return (s.extra && s.extra[key]) || null;
     },
 
     clearAll: function () {
