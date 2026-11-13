@@ -34,17 +34,17 @@
   </header>
   <main class="content">
     <section class="greeting">
-      <div class="date">11 月 13 日 · 星期四</div>
+      <div class="date" id="home-date">今天</div>
       <h1>今天想从哪里开始？</h1>
       <p>这里是一间只属于你的小房间。不评价、不打分，只陪你把自己慢慢理清楚。你可以随时离开，也可以随时回来。</p>
     </section>
 
-    <a class="card resume" href="write-down.html">
+    <a class="card resume" href="event-start.html" id="resume-card">
       <span class="resume-icon"><svg viewBox="0 0 24 24"><path d="M12 8v5l3 2M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z"/></svg></span>
       <span class="grow">
-        <span class="lbl">接着上次</span>
-        <h3>继续梳理那次见面</h3>
-        <p>上次写到了「写下经过」· 私密叙述</p>
+        <span class="lbl" id="resume-lbl">还没有保存的记录</span>
+        <h3 id="resume-title">从一次具体的事开始</h3>
+        <p id="resume-sub">先做一次安全检查，再写下你想整理的部分。</p>
       </span>
       <span class="entry-arrow">›</span>
     </a>
@@ -91,5 +91,39 @@
     <a class="tab-item" href="reflect.html"><svg viewBox="0 0 24 24"><path d="M5 9h14v11H5zM6 3v4m12-4v4M8 14h3m-3 3h7"/></svg>成长</a>
   </nav>
 </div>
+<script src="store.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var WEEK = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+  var now = new Date();
+  document.getElementById('home-date').textContent =
+    (now.getMonth() + 1) + ' 月 ' + now.getDate() + ' 日 · ' + WEEK[now.getDay()];
+
+  var S = window.HWVStore;
+  if (!S || !S.available) return;
+
+  var state = S.read();
+  if (!S.hasContent(state)) return;
+
+  function fmt(iso) {
+    try {
+      var d = new Date(iso);
+      if (isNaN(d.getTime())) return '';
+      return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+    } catch (e) {
+      return '';
+    }
+  }
+
+  var card = document.getElementById('resume-card');
+  card.setAttribute('href', 'write-down.html');
+  document.getElementById('resume-lbl').textContent = '接着上次';
+  document.getElementById('resume-title').textContent = '继续梳理这件事';
+  document.getElementById('resume-sub').textContent =
+    '上次保存于 ' + fmt(state.updatedAt) + '；继续前会再确认一次你此刻是否安全。';
+})();
+</script>
 </body>
 </html>
