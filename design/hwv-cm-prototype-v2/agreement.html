@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="dsh-design" content="app">
+  <title>一起商量 · HWV-CM 人文关怀版</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    .agree-card { margin-top: 16px; padding: var(--sp-5); display: grid; gap: 18px; }
+    .agree-card .q-no { color: var(--primary); font-size: var(--fs-xs); font-weight: 600; letter-spacing: .06em; }
+    .agree-card .q-title { margin-top: 4px; font-size: var(--fs-md); font-weight: 600; line-height: 1.45; }
+    .single-note { margin-top: 16px; padding: 14px 16px; border-radius: var(--radius-md); background: var(--accent-soft); color: #7c4a2c; font-size: var(--fs-sm); line-height: 1.7; }
+    .review-options { display: grid; gap: 10px; margin-top: 6px; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="statusbar"><span>9:41</span><span class="sb-icons">▂▄▆ ▮</span></div>
+  <header class="topbar">
+    <a class="back" href="results.html"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>返回</a>
+    <span class="topbar-title">一起商量</span>
+  </header>
+  <main class="content">
+    <div class="eyebrow">改善 · 本人意愿记录</div>
+    <h1 class="page-title">你愿意尝试的改变</h1>
+    <p class="page-lede">约定不逼你承诺，也不替对方答应任何事。这里只记录你本人的意愿——改什么、愿意怎么试、什么时候回头看。</p>
+
+    <div class="single-note">
+      <strong>关于双人约定：</strong>v2 为单人模式，共同约定的「双方分别同意、共享与撤回」为未来预留能力。当前记录只属于你自己。
+    </div>
+
+    <section class="card agree-card">
+      <div>
+        <div class="q-no">01 · 想改善的具体事情</div>
+        <p class="q-title">哪一件具体的小事，是你愿意先试试的？</p>
+        <div class="form-field" style="margin-top:10px">
+          <textarea class="textarea" id="agenda" placeholder="例如：下次见面时，提前说明我对守时的在意。"></textarea>
+        </div>
+      </div>
+      <div>
+        <div class="q-no">02 · 我愿意尝试的行动</div>
+        <p class="q-title">为了这件事，你愿意做的一个具体动作是什么？</p>
+        <div class="form-field" style="margin-top:10px">
+          <textarea class="textarea" id="action" placeholder="例如：我会在见面时用「我希望」开头，说出我的需要。"></textarea>
+        </div>
+      </div>
+      <div>
+        <div class="q-no">03 · 回顾时间</div>
+        <p class="q-title">什么时候回来看看做得怎么样？</p>
+        <div class="review-options">
+          <a class="option selected" href="agreement.html"><span class="radio"></span>一周后</a>
+          <a class="option" href="agreement.html"><span class="radio"></span>两周后</a>
+          <a class="option" href="agreement.html"><span class="radio"></span>一个月后</a>
+          <a class="option" href="agreement.html"><span class="radio"></span>我自己定时间（示意）</a>
+        </div>
+      </div>
+      <div>
+        <div class="q-no">04 · 修改或结束的方式</div>
+        <p class="q-title">这份约定随时可以修改或结束，你决定即可。</p>
+        <div class="callout" style="margin-top:10px">没有「坚持到底」的义务。改变不需要一次做到完美。</div>
+      </div>
+    </section>
+
+    <div class="actions">
+      <a class="btn btn-primary btn-block" href="reflect.html">记下来了，去回顾成长</a>
+      <a class="btn btn-quiet btn-block" href="results.html">暂不记录</a>
+    </div>
+  </main>
+  <nav class="tabbar" aria-label="主导航">
+    <a class="tab-item" href="home.html"><svg viewBox="0 0 24 24"><path d="m3.5 10.5 8.5-7 8.5 7v9a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg>首页</a>
+    <a class="tab-item" href="know-self.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3.2"/><path d="M5.5 20c.5-3.4 2.7-5.2 6.5-5.2s6 1.8 6.5 5.2"/></svg>认识自己</a>
+    <a class="tab-item" href="understand.html"><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="15" r="3"/><path d="M10.2 11.2 13.8 13.8"/></svg>理解彼此</a>
+    <a class="tab-item active" href="event-start.html"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h4"/></svg>一件事</a>
+    <a class="tab-item" href="reflect.html"><svg viewBox="0 0 24 24"><path d="M5 9h14v11H5zM6 3v4m12-4v4M8 14h3m-3 3h7"/></svg>成长</a>
+  </nav>
+</div>
+</body>
+</html>
