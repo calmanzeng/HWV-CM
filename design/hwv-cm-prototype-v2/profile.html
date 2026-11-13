@@ -207,7 +207,10 @@
       render();
       setNotice('已删除。本机存储中不再保留你的记录。', 'ok');
     } else {
-      setNotice('删除未完成（' + (res.reason === 'unavailable' ? '存储不可用' : '写入受限') + '），请重试或清理浏览器存储空间后再试。', 'warn');
+      var why = res.reason === 'unavailable' ? '存储不可用'
+        : res.reason === 'session' ? '会话标记未能清除（' + (res.sessionKeys || []).join('、') + '）'
+        : '写入受限';
+      setNotice('删除未完成（' + why + '），请重试或清理浏览器存储空间后再试。', 'warn');
     }
   });
 
