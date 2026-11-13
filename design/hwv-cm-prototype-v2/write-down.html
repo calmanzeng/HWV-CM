@@ -6,6 +6,20 @@
   <meta name="dsh-design" content="app">
   <title>写下经过 · HWV-CM 人文关怀版</title>
   <link rel="stylesheet" href="tokens.css">
+  <!-- 安全检查守卫：未经安全确认不得进入「写下经过」 -->
+  <script>
+    (function () {
+      var ok = false;
+      try {
+        ok = window.sessionStorage.getItem('hwv.flow.safety') === 'safe';
+      } catch (e) {
+        ok = false;
+      }
+      if (!ok) {
+        window.location.replace('event-start.html?need-safety=1');
+      }
+    })();
+  </script>
   <style>
     .flow { margin-top: 18px; }
     .form-card { margin-top: 14px; padding: var(--sp-5); display: grid; gap: 16px; }
