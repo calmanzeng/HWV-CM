@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="dsh-design" content="app">
+  <title>个人档案 · HWV-CM 人文关怀版</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    .head-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 20px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+    .stat { padding: 14px 10px; text-align: center; }
+    .stat .num { font-size: var(--fs-lg); font-weight: 700; color: var(--primary-dark); }
+    .stat .lbl { margin-top: 2px; color: var(--muted); font-size: var(--fs-xs); }
+    .block { margin-top: 16px; padding: var(--sp-5); }
+    .block h3 { font-size: var(--fs-md); font-weight: 600; }
+    .block p { margin-top: 6px; color: var(--ink-2); font-size: var(--fs-sm); line-height: 1.65; }
+    .obs-item p { margin-top: 0; }
+    .writeback { margin-top: 16px; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="statusbar"><span>9:41</span><span class="sb-icons">▂▄▆ ▮</span></div>
+  <header class="topbar">
+    <a class="back" href="know-self.html"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>返回</a>
+    <span class="topbar-title">个人档案</span>
+    <a class="link" href="know-self.html" style="min-height:44px;display:flex;align-items:center">继续探索</a>
+  </header>
+  <main class="content">
+    <div class="eyebrow">自我观察的记录</div>
+    <div class="head-row">
+      <h1 class="page-title" style="margin-top:4px">你的档案</h1>
+      <span class="pill">仅自己可见</span>
+    </div>
+    <p class="page-lede">这里收集你在探索中留下的痕迹。它不是对你的裁定，只是你愿意记录下来的、关于自己的片段。</p>
+
+    <div class="stat-grid">
+      <div class="card stat"><div class="num">1</div><div class="lbl">已回答</div></div>
+      <div class="card stat"><div class="num">0</div><div class="lbl">已跳过</div></div>
+      <div class="card stat"><div class="num">2</div><div class="lbl">观察记录</div></div>
+    </div>
+
+    <section class="card block">
+      <h3>我的观察记录</h3>
+      <div class="list-item"><span class="dot"></span>
+        <div><p style="color:var(--ink-2);font-size:var(--fs-sm);line-height:1.6">失去约但提前说明时，我会感到安心——我重视可预期与被尊重。</p>
+        <span class="pill" style="margin-top:6px">本人已确认</span></div>
+      </div>
+      <div class="list-item"><span class="dot"></span>
+        <div><p style="color:var(--ink-2);font-size:var(--fs-sm);line-height:1.6">发生争执时，我需要先暂停一下，再谈解释与解决。</p>
+        <span class="pill" style="margin-top:6px;background:var(--warning-soft);color:#7c4526">单次表达 · 待确认</span></div>
+      </div>
+    </section>
+
+    <section class="card block">
+      <h3>价值取向</h3>
+      <p>还没有整理。在「认识自己」里回答几个问题后，可以回来看看自己更在意什么——这只是参考，不代表你应该成为什么样的人。</p>
+      <div style="margin-top:14px"><a class="link" href="know-self.html">去回答第一个问题 →</a></div>
+    </section>
+
+    <section class="card block writeback">
+      <h3>回写说明</h3>
+      <p>复盘后是否更新档案，由你主动确认。产品不会自动替你改写任何记录。</p>
+      <div class="callout" style="margin-top:12px">档案不会自动共享给任何人；在 v2 中不存在共享路径。</div>
+    </section>
+
+    <p class="footer-note">本机保存 · 不上传 · 不等于设备加密</p>
+  </main>
+  <nav class="tabbar" aria-label="主导航">
+    <a class="tab-item" href="home.html"><svg viewBox="0 0 24 24"><path d="m3.5 10.5 8.5-7 8.5 7v9a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg>首页</a>
+    <a class="tab-item active" href="know-self.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3.2"/><path d="M5.5 20c.5-3.4 2.7-5.2 6.5-5.2s6 1.8 6.5 5.2"/></svg>认识自己</a>
+    <a class="tab-item" href="understand.html"><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="15" r="3"/><path d="M10.2 11.2 13.8 13.8"/></svg>理解彼此</a>
+    <a class="tab-item" href="event-start.html"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h4"/></svg>一件事</a>
+    <a class="tab-item" href="reflect.html"><svg viewBox="0 0 24 24"><path d="M5 9h14v11H5zM6 3v4m12-4v4M8 14h3m-3 3h7"/></svg>成长</a>
+  </nav>
+</div>
+</body>
+</html>
