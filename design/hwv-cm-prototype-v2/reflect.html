@@ -169,6 +169,10 @@
       if (!res.ok) {
         e.preventDefault();
         setNotice('写入档案失败：浏览器存储不可用或已满。', 'warn');
+        return;
+      }
+      if (res.reason === 'duplicate') {
+        setNotice('这条认识已经写入过档案，不会重复添加。', '');
       }
     });
   }
