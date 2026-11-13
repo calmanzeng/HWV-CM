@@ -164,6 +164,7 @@
   }
 
   window.addEventListener('pageshow', function (ev) {
+    if (done) done.removeAttribute('data-done');
     if (ev.persisted) return;            // 从缓存返回：沿用同一次回顾的提交 ID，仍被幂等拦住
     submitting = false;
     submitId = null;
