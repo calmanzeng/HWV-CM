@@ -149,9 +149,37 @@
     }).join('');
   }
 
+  var REVIEW_KEY = 'hwv.flow.reviewId';
+  var submitId = null;
+  var submitting = false;
+
+  function ensureSubmitId() {
+    if (submitId) return submitId;
+    try { submitId = window.sessionStorage.getItem(REVIEW_KEY); } catch (e) { submitId = null; }
+    if (!submitId) {
+      submitId = 'rev-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+      try { window.sessionStorage.setItem(REVIEW_KEY, submitId); } catch (e) {}
+    }
+    return submitId;
+  }
+
+  window.addEventListener('pageshow', function (ev) {
+    if (ev.persisted) return;            // 从缓存返回：沿用同一次回顾的提交 ID，仍被幂等拦住
+    submitting = false;
+    submitId = null;
+    try { window.sessionStorage.removeItem(REVIEW_KEY); } catch (e) {}
+    ensureSubmitId();
+  });
+  ensureSubmitId();
+
   if (done) {
     done.addEventListener('click', function (e) {
       if (!sw.checked) return;
+
+      if (done.getAttribute('data-done') === '1' || submitting) {
+        e.preventDefault();
+        return;
+      }
 
       var text = (r4 && r4.value ? r4.value : '').trim();
       if (!text) {
@@ -165,15 +193,26 @@
         setNotice('当前浏览器无法保存，这条认识不会写入档案。', 'warn');
         return;
       }
-      var res = S.addObservation(text, true);
+
+      submitting = true;
+      var res = S.addObservation(text, true, { id: ensureSubmitId(), source: 'reflect' });
+      submitting = false;
+
       if (!res.ok) {
         e.preventDefault();
-        setNotice('写入档案失败：浏览器存储不可用或已满。', 'warn');
+        setNotice('写入档案失败：浏览器存储不可用或已满。你可以再试一次。', 'warn');
         return;
       }
+
       if (res.reason === 'duplicate') {
-        setNotice('这条认识已经写入过档案，不会重复添加。', '');
+        e.preventDefault();
+        setNotice('这条认识已经在这次回顾里写入过档案，不会重复添加。', '');
+        window.setTimeout(function () { window.location.href = 'home.html'; }, 900);
+        return;
       }
+
+      done.setAttribute('data-done', '1');
+      renderGrowth();
     });
   }
 
