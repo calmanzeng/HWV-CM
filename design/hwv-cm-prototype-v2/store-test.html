@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HWV-CM 原型 v2 · 数据层断言</title>
+<style>
+  body { font-family: system-ui, -apple-system, "PingFang SC", sans-serif; padding: 20px; background: #f6f4ee; color: #26302a; line-height: 1.6; }
+  h1 { font-size: 18px; }
+  .warn { background: #f8ede3; color: #7c4526; padding: 10px 12px; border-radius: 10px; font-size: 13px; }
+  li { margin: 6px 0; font-size: 14px; }
+  .pass { color: #4a7c59; }
+  .fail { color: #b0433a; font-weight: 600; }
+  code { background: #efede5; padding: 1px 4px; border-radius: 4px; }
+  #sum { font-size: 15px; margin-top: 14px; }
+</style>
+</head>
+<body>
+<h1>HWV-CM 原型 v2 · store.js 行为断言</h1>
+<p class="warn">本页会清空本机该原型的数据（局部清理 localStorage 与 sessionStorage 中的 hwv.* 键）。请先用独立浏览器配置，或先导出备份。</p>
+<p>把本文件与 <code>store.js</code> 放在同一目录后打开，全部断言在页面内执行，不联网。</p>
+<ol id="out"></ol>
+<p id="sum"></p>
+<script src="store.js"></script>
+<script>
+(function () {
+  var out = document.getElementById('out');
+  var results = [];
+
+  function check(name, fn) {
+    var ok = false, detail = '';
+    try {
+      var r = fn();
+      ok = r === true;
+      if (!ok && typeof r === 'string') detail = r;
+    } catch (e) {
+      ok = false;
+      detail = '异常：' + e.message;
+    }
+    results.push({ ok: ok });
+    var li = document.createElement('li');
+    li.className = ok ? 'pass' : 'fail';
+    li.textContent = (ok ? 'PASS  ' : 'FAIL  ') + name + (detail ? ' — ' + detail : '');
+    out.appendChild(li);
+  }
+
+  var S = window.HWVStore;
+  if (!S) {
+    var li0 = document.createElement('li');
+    li0.className = 'fail';
+    li0.textContent = 'FAIL  store.js 未加载：请把两个文件放在同一目录再打开';
+    out.appendChild(li0);
+    return;
+  }
+
+  try { localStorage.clear(); sessionStorage.clear(); } catch (e) {}
+
+  check('存储可用', function () { return S.available === true || 'localStorage 不可用（若在隐私模式，此项失败属预期）'; });
+  check('初始无内容', function () { return S.hasContent() === false; });
+  check('初始无存储键', function () { return localStorage.getItem('hwv.v2.state') === null; });
+
+  S.saveEvent({ facts: '', disputed: '', feelings: '', needs: '', interpretation: '' });
+  check('空事件不留下存储键（不产生幻影草稿）', function () {
+    return localStorage.getItem('hwv.v2.state') === null || '仍留下 ' + localStorage.getItem('hwv.v2.state');
+  });
+  check('空事件后 hasContent 为 false', function () { return S.hasContent() === false; });
+
+  S.saveEvent({ facts: '约好 18:00，对方 18:30 到' });
+  check('写入内容后存储键存在', function () { return localStorage.getItem('hwv.v2.state') !== null; });
+  check('写入内容后 hasContent 为 true', function () { return S.hasContent() === true; });
+
+  S.addObservation('同一句话', false, { id: 'obs-A' });
+  S.addObservation('同一句话', false, { id: 'obs-A' });
+  check('同一提交 ID 只产生 1 条观察', function () { return S.read().observations.length === 1 || '实际 ' + S.read().observations.length + ' 条'; });
+
+  S.addObservation('同一句话', false, { id: 'obs-B' });
+  check('不同提交 ID 的同文本可再次记录', function () { return S.read().observations.length === 2 || '实际 ' + S.read().observations.length + ' 条'; });
+
+  S.addAgreement({ agenda: '提前说明', action: '用「我希望」开头', reviewAt: '一周后' }, { id: 'agr-A' });
+  S.addAgreement({ agenda: '提前说明', action: '用「我希望」开头', reviewAt: '一周后' }, { id: 'agr-A' });
+  check('同一提交 ID 只产生 1 条约定', function () { return S.read().agreements.length === 1 || '实际 ' + S.read().agreements.length + ' 条'; });
+
+  S.saveExtra('knowSelf.q1', { text: '我更在乎提前通知', at: new Date().toISOString() });
+  check('导出内容含 extra 字段', function () { return S.exportText().indexOf('"extra"') !== -1; });
+  check('导出内容含认识自己的回答', function () { return S.exportText().indexOf('我更在乎提前通知') !== -1; });
+
+  S.clearAll();
+  S.saveExtra('knowSelf.q1', { text: '只有这一条回答' });
+  check('仅 extra 有内容时 hasContent 应为 true（导出前置条件）', function () {
+    return S.hasContent() === true || '当前为 false：这类记录会被导出按钮判为「没有记录」';
+  });
+
+  try { sessionStorage.setItem('hwv.flow.reviewId', 'x'); sessionStorage.setItem('hwv.flow.agreementId', 'y'); } catch (e) {}
+  S.clearAll();
+  check('删除后存储键为空', function () { return localStorage.getItem('hwv.v2.state') === null; });
+  check('删除后会话标识一并清除', function () {
+    var left = [];
+    ['hwv.flow.reviewId', 'hwv.flow.agreementId', 'hwv.flow.safety', 'hwv.flow.consent'].forEach(function (k) {
+      try { if (sessionStorage.getItem(k) !== null) left.push(k); } catch (e) {}
+    });
+    return left.length === 0 || '残留：' + left.join(', ');
+  });
+
+  var failed = results.filter(function (r) { return !r.ok; }).length;
+  document.getElementById('sum').textContent =
+    '合计 ' + results.length + ' 项，通过 ' + (results.length - failed) + ' 项，失败 ' + failed + ' 项。';
+})();
+</script>
+</body>
+</html>
