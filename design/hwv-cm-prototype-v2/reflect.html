@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="dsh-design" content="app">
+  <title>回顾成长 · HWV-CM 人文关怀版</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    .review-card { margin-top: 16px; padding: var(--sp-5); display: grid; gap: 16px; }
+    .review-card .q-no { color: var(--primary); font-size: var(--fs-xs); font-weight: 600; letter-spacing: .06em; }
+    .review-card .q-title { margin-top: 4px; font-size: var(--fs-md); font-weight: 600; line-height: 1.45; }
+    .growth { margin-top: 16px; padding: var(--sp-5); }
+    .growth h3 { font-size: var(--fs-md); font-weight: 600; }
+    .growth-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; }
+    .growth-item + .growth-item { border-top: 1px solid var(--line); }
+    .writeback-block { margin-top: 16px; padding: var(--sp-5); }
+    .writeback-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; }
+    .switch { position: relative; width: 48px; height: 28px; flex: 0 0 48px; border-radius: 999px; background: var(--primary); }
+    .switch::after { content: ""; position: absolute; top: 3px; right: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="statusbar"><span>9:41</span><span class="sb-icons">▂▄▆ ▮</span></div>
+  <header class="topbar">
+    <a class="back" href="home.html"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>返回</a>
+    <span class="topbar-title">回顾成长</span>
+  </header>
+  <main class="content">
+    <div class="eyebrow">成长 · 复盘与记录</div>
+    <h1 class="page-title">看见变化，也看见困难</h1>
+    <p class="page-lede">复盘不是打分。它只是回头看看：当初想改善什么、现在怎么样了、你自己有哪些新的认识。</p>
+
+    <section class="card review-card">
+      <div>
+        <div class="q-no">01</div>
+        <p class="q-title">当初，你希望改善的是什么？</p>
+        <div class="form-field" style="margin-top:10px">
+          <textarea class="textarea" id="r1" placeholder="例如：我希望见面更守时，能提前说明。"></textarea>
+        </div>
+      </div>
+      <div>
+        <div class="q-no">02</div>
+        <p class="q-title">实际发生了什么？哪些事情有变化？</p>
+        <div class="form-field" style="margin-top:10px">
+          <textarea class="textarea" id="r2" placeholder="可以写有变化的，也可以写没有变化的。"></textarea>
+        </div>
+      </div>
+      <div>
+        <div class="q-no">03</div>
+        <p class="q-title">哪些地方仍然困难？你现在怎么看待它？</p>
+        <div class="form-field" style="margin-top:10px">
+          <textarea class="textarea" id="r3" placeholder="承认困难也是一种看见。"></textarea>
+        </div>
+      </div>
+      <div>
+        <div class="q-no">04</div>
+        <p class="q-title">这之后，你对自己有什么新的认识？</p>
+        <div class="form-field" style="margin-top:10px">
+          <textarea class="textarea" id="r4" placeholder="例如：我发现自己更需要提前约定，而不是临时安排。"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="card growth">
+      <h3>成长记录</h3>
+      <div class="growth-item"><span class="dot" style="margin-top:7px"></span>
+        <div><p style="font-size:var(--fs-sm);line-height:1.6;color:var(--ink-2)"><strong>「我更在意被尊重与可预期」</strong><br><span style="color:var(--muted)">来自上次事件整理 · 待确认</span></p></div>
+      </div>
+    </section>
+
+    <section class="card writeback-block">
+      <h3>是否回写个人档案？</h3>
+      <p style="margin-top:6px;color:var(--ink-2);font-size:var(--fs-sm);line-height:1.65">如果这次复盘让你更了解自己，可以选择把一条新的认识写进档案。这一步需要你主动确认。</p>
+      <div class="writeback-row">
+        <span style="font-size:var(--fs-base);font-weight:600">把新认识写入档案</span>
+        <span class="switch" role="switch" aria-checked="true"></span>
+      </div>
+      <div class="callout" style="margin-top:12px">档案只保存在本机，不会自动共享给任何人。</div>
+    </section>
+
+    <div class="actions">
+      <a class="btn btn-primary btn-block" href="home.html">完成本次回顾</a>
+      <a class="btn btn-soft btn-block" href="agreement.html">回去看我的约定</a>
+    </div>
+    <p class="footer-note">复盘不产生评分，不评价你做得够不够好。</p>
+  </main>
+  <nav class="tabbar" aria-label="主导航">
+    <a class="tab-item" href="home.html"><svg viewBox="0 0 24 24"><path d="m3.5 10.5 8.5-7 8.5 7v9a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg>首页</a>
+    <a class="tab-item" href="know-self.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3.2"/><path d="M5.5 20c.5-3.4 2.7-5.2 6.5-5.2s6 1.8 6.5 5.2"/></svg>认识自己</a>
+    <a class="tab-item" href="understand.html"><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="15" r="3"/><path d="M10.2 11.2 13.8 13.8"/></svg>理解彼此</a>
+    <a class="tab-item" href="event-start.html"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h4"/></svg>一件事</a>
+    <a class="tab-item active" href="reflect.html"><svg viewBox="0 0 24 24"><path d="M5 9h14v11H5zM6 3v4m12-4v4M8 14h3m-3 3h7"/></svg>成长</a>
+  </nav>
+</div>
+</body>
+</html>
