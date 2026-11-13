@@ -17,6 +17,15 @@
     .block p { margin-top: 6px; color: var(--ink-2); font-size: var(--fs-sm); line-height: 1.65; }
     .obs-item p { margin-top: 0; }
     .writeback { margin-top: 16px; }
+    .meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .danger-zone { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); display: grid; gap: 10px; }
+    .danger-zone[hidden] { display: none; }
+    .danger-text { color: var(--danger); font-size: var(--fs-sm); line-height: 1.65; }
+    .notice { margin-top: 12px; color: var(--muted); font-size: var(--fs-sm); line-height: 1.6; }
+    .notice.is-ok { color: var(--success); }
+    .notice.is-warn { color: var(--danger); }
+    .obs-empty { color: var(--muted); font-size: var(--fs-sm); line-height: 1.7; padding: 12px 0; }
+    .stat .num.small { font-size: var(--fs-md); }
   </style>
 </head>
 <body>
@@ -36,20 +45,16 @@
     <p class="page-lede">这里收集你在探索中留下的痕迹。它不是对你的裁定，只是你愿意记录下来的、关于自己的片段。</p>
 
     <div class="stat-grid">
-      <div class="card stat"><div class="num">1</div><div class="lbl">已回答</div></div>
-      <div class="card stat"><div class="num">0</div><div class="lbl">已跳过</div></div>
-      <div class="card stat"><div class="num">2</div><div class="lbl">观察记录</div></div>
+      <div class="card stat"><div class="num" id="stat-observations">0</div><div class="lbl">观察记录</div></div>
+      <div class="card stat"><div class="num" id="stat-events">0</div><div class="lbl">事件草稿</div></div>
+      <div class="card stat"><div class="num" id="stat-agreements">0</div><div class="lbl">约定</div></div>
     </div>
+    <p class="footer-note" style="margin-top:8px;text-align:left">不统计「跳过」——跳过几次不该变成对你的评分。</p>
 
     <section class="card block">
       <h3>我的观察记录</h3>
-      <div class="list-item"><span class="dot"></span>
-        <div><p style="color:var(--ink-2);font-size:var(--fs-sm);line-height:1.6">失去约但提前说明时，我会感到安心——我重视可预期与被尊重。</p>
-        <span class="pill" style="margin-top:6px">本人已确认</span></div>
-      </div>
-      <div class="list-item"><span class="dot"></span>
-        <div><p style="color:var(--ink-2);font-size:var(--fs-sm);line-height:1.6">发生争执时，我需要先暂停一下，再谈解释与解决。</p>
-        <span class="pill" style="margin-top:6px;background:var(--warning-soft);color:#7c4526">单次表达 · 待确认</span></div>
+      <div id="obs-list">
+        <p class="obs-empty">还没有记录。在「认识自己」或「回顾成长」里确认过的内容，会出现在这里。</p>
       </div>
     </section>
 
@@ -65,6 +70,25 @@
       <div class="callout" style="margin-top:12px">档案不会自动共享给任何人；在 v2 中不存在共享路径。</div>
     </section>
 
+    <section class="card block" id="data-manage">
+      <h3>数据管理</h3>
+      <p>所有内容保存在这台设备的浏览器里，不会上传。你可以随时导出带走，也可以彻底删除。</p>
+      <div class="meta-row">
+        <span class="pill" id="store-size">占用 0 KB</span>
+        <span class="pill" id="store-updated">尚未保存</span>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn btn-ghost btn-block" id="btn-export">导出为 JSON 文件</button>
+        <button type="button" class="btn btn-danger-soft btn-block" id="btn-ask-delete">删除全部记录</button>
+      </div>
+      <div class="danger-zone" id="confirm-zone" hidden>
+        <p class="danger-text">删除后无法恢复，也不会留下备份。事件记录、整理结果、观察记录和约定会一起消失。</p>
+        <button type="button" class="btn btn-danger-soft btn-block" id="btn-delete">确认删除，无法恢复</button>
+        <button type="button" class="btn btn-quiet btn-block" id="btn-cancel">取消</button>
+      </div>
+      <p class="notice" id="manage-notice" aria-live="polite"></p>
+    </section>
+
     <p class="footer-note">本机保存 · 不上传 · 不等于设备加密</p>
   </main>
   <nav class="tabbar" aria-label="主导航">
@@ -75,5 +99,120 @@
     <a class="tab-item" href="reflect.html"><svg viewBox="0 0 24 24"><path d="M5 9h14v11H5zM6 3v4m12-4v4M8 14h3m-3 3h7"/></svg>成长</a>
   </nav>
 </div>
+<script src="store.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var S = window.HWVStore;
+  var obsList = document.getElementById('obs-list');
+  var statObs = document.getElementById('stat-observations');
+  var statEvents = document.getElementById('stat-events');
+  var statAgreements = document.getElementById('stat-agreements');
+  var sizePill = document.getElementById('store-size');
+  var updatedPill = document.getElementById('store-updated');
+  var notice = document.getElementById('manage-notice');
+  var zone = document.getElementById('confirm-zone');
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function fmt(iso) {
+    try {
+      var d = new Date(iso);
+      if (isNaN(d.getTime())) return '';
+      return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2) +
+        ' ' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function setNotice(text, kind) {
+    notice.textContent = text || '';
+    notice.className = 'notice' + (kind ? ' is-' + kind : '');
+  }
+
+  function render() {
+    if (!S || !S.available) {
+      sizePill.textContent = '存储不可用';
+      updatedPill.textContent = '无法读取';
+      setNotice('当前浏览器不允许访问本地存储，本页无法显示或管理记录。', 'warn');
+      return;
+    }
+
+    var state = S.read();
+    var obs = state.observations || [];
+    statObs.textContent = String(obs.length);
+    statEvents.textContent = state.event ? '1' : '0';
+    statAgreements.textContent = String((state.agreements || []).length);
+
+    if (obs.length) {
+      obsList.innerHTML = obs.map(function (o) {
+        var tag = o.confirmed
+          ? '<span class="pill" style="margin-top:6px">本人已确认</span>'
+          : '<span class="pill" style="margin-top:6px;background:var(--warning-soft);color:#7c4526">单次表达 · 待确认</span>';
+        return '<div class="list-item"><span class="dot"></span><div>' +
+          '<p style="color:var(--ink-2);font-size:var(--fs-sm);line-height:1.6">' + esc(o.text) + '</p>' +
+          tag + '</div></div>';
+      }).join('');
+    } else {
+      obsList.innerHTML = '<p class="obs-empty">还没有记录。在「认识自己」或「回顾成长」里确认过的内容，会出现在这里。</p>';
+    }
+
+    sizePill.textContent = '占用 ' + (S.sizeBytes() / 1024).toFixed(1) + ' KB';
+    updatedPill.textContent = state.updatedAt ? '最近保存 ' + fmt(state.updatedAt) : '尚未保存';
+  }
+
+  document.getElementById('btn-export').addEventListener('click', function () {
+    if (!S || !S.available) { setNotice('当前浏览器无法读取记录，无法导出。', 'warn'); return; }
+    if (!S.hasContent()) { setNotice('还没有可导出的记录。', ''); return; }
+    try {
+      var blob = new Blob([S.exportText()], { type: 'application/json;charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var d = new Date();
+      var name = 'HWV-CM-导出-' + d.getFullYear() + ('0' + (d.getMonth() + 1)).slice(-2) + ('0' + d.getDate()).slice(-2) +
+        '-' + ('0' + d.getHours()).slice(-2) + ('0' + d.getMinutes()).slice(-2) + '.json';
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+      setNotice('已生成导出文件，由浏览器下载到你的设备。文件不上传任何服务器。', 'ok');
+    } catch (e) {
+      setNotice('导出失败，浏览器可能限制了下载。', 'warn');
+    }
+  });
+
+  document.getElementById('btn-ask-delete').addEventListener('click', function () {
+    zone.hidden = false;
+    setNotice('删除前请再确认一次：这一步没有备份，也无法撤销。', '');
+  });
+
+  document.getElementById('btn-cancel').addEventListener('click', function () {
+    zone.hidden = true;
+    setNotice('已取消，什么都没有删除。', '');
+  });
+
+  document.getElementById('btn-delete').addEventListener('click', function () {
+    if (!S) { setNotice('数据层未加载，无法删除。', 'warn'); return; }
+    var res = S.clearAll();
+    if (res.ok) {
+      zone.hidden = true;
+      render();
+      setNotice('已删除。本机存储中不再保留你的记录。', 'ok');
+    } else {
+      setNotice('删除未完成（' + (res.reason === 'unavailable' ? '存储不可用' : '写入受限') + '），请重试或清理浏览器存储空间后再试。', 'warn');
+    }
+  });
+
+  render();
+})();
+</script>
 </body>
 </html>
