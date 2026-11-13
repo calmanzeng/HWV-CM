@@ -110,6 +110,21 @@
       }
       if (s.results) return true;
       if (s.observations.length || s.agreements.length) return true;
+
+      var extra = s.extra || {};
+      var k;
+      for (k in extra) {
+        if (!Object.prototype.hasOwnProperty.call(extra, k)) continue;
+        var val = extra[k];
+        if (typeof val === 'string' && val.trim()) return true;
+        if (val && typeof val === 'object') {
+          var n;
+          for (n in val) {
+            if (!Object.prototype.hasOwnProperty.call(val, n)) continue;
+            if (typeof val[n] === 'string' && val[n].trim()) return true;
+          }
+        }
+      }
       return false;
     },
 
@@ -232,6 +247,8 @@
       try {
         global.sessionStorage.removeItem('hwv.flow.safety');
         global.sessionStorage.removeItem('hwv.flow.consent');
+        global.sessionStorage.removeItem('hwv.flow.reviewId');
+        global.sessionStorage.removeItem('hwv.flow.agreementId');
       } catch (e) {}
       var empty = box.getItem(KEY) === null;
       notify(blank());
