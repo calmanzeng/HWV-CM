@@ -131,12 +131,64 @@
   } catch (e) {}
   S.clearAll();
   check('删除后存储键为空', function () { return localStorage.getItem('hwv.v2.state') === null; });
-  check('删除后会话标识一并清除', function () {
+  check('删除后会话标识一并清除，且清理失败能被报告', function () {
+    // A. 正常清理：四个键都预置
+    try {
+      sessionStorage.setItem('hwv.flow.reviewId', 'x');
+      sessionStorage.setItem('hwv.flow.agreementId', 'y');
+      sessionStorage.setItem('hwv.flow.safety', 'safe');
+      sessionStorage.setItem('hwv.flow.consent', '1');
+    } catch (e) {}
+
+    var okRes = S.clearAll();
     var left = [];
     ['hwv.flow.reviewId', 'hwv.flow.agreementId', 'hwv.flow.safety', 'hwv.flow.consent'].forEach(function (k) {
       try { if (sessionStorage.getItem(k) !== null) left.push(k); } catch (e) {}
     });
-    return left.length === 0 || '残留：' + left.join(', ');
+    if (!okRes.ok || left.length) {
+      return '正常清理失败：ok=' + okRes.ok + '，残留=' + (left.join(',') || '无');
+    }
+
+    // B. 模拟 removeItem 对 reviewId 失效
+    var proto = null, original = null, patched = false;
+    try {
+      proto = Object.getPrototypeOf(window.sessionStorage);
+      original = proto.removeItem;
+      proto.removeItem = function (k) {
+        if (k === 'hwv.flow.reviewId') return;
+        return original.apply(this, arguments);
+      };
+      patched = true;
+    } catch (e) { patched = false; }
+
+    if (!patched) return '当前浏览器不支持打补丁模拟，请改用 DevTools 手工验证';
+
+    var failRes;
+    try {
+      sessionStorage.setItem('hwv.flow.reviewId', 'z');
+      sessionStorage.setItem('hwv.flow.safety', 'safe');
+      sessionStorage.setItem('hwv.flow.consent', '1');
+      sessionStorage.setItem('hwv.flow.agreementId', 'y');
+      failRes = S.clearAll();
+    } finally {
+      proto.removeItem = original;
+    }
+
+    if (failRes.ok) return '清理失败却返回成功（ok=true）';
+    if (failRes.reason !== 'session') return '返回 reason=' + failRes.reason + '，期望 session';
+    if (!failRes.sessionKeys || failRes.sessionKeys.indexOf('hwv.flow.reviewId') === -1) {
+      return '未列出残留键：' + JSON.stringify(failRes.sessionKeys);
+    }
+
+    // 关键补充：失败只应发生在 reviewId 上，其余三个键必须已被清理
+    var otherLeft = [];
+    ['hwv.flow.safety', 'hwv.flow.consent', 'hwv.flow.agreementId'].forEach(function (k) {
+      try { if (sessionStorage.getItem(k) !== null) otherLeft.push(k); } catch (e) {}
+    });
+    if (otherLeft.length) return '其余会话键未被清理：' + otherLeft.join(',');
+
+    try { sessionStorage.removeItem('hwv.flow.reviewId'); } catch (e) {}
+    return true;
   });
 
   var failed = results.filter(function (r) { return !r.ok; }).length;
