@@ -153,12 +153,14 @@
             notify(blank());
             return { ok: false, reason: 'unavailable', state: blank() };
           }
+          var cleared = false;
           try {
             box.removeItem(KEY);
+            cleared = box.getItem(KEY) === null;
           } catch (e) {
             return { ok: false, reason: 'error', state: read() };
           }
-          if (box.getItem(KEY) !== null) {
+          if (!cleared) {
             return { ok: false, reason: 'error', state: read() };
           }
           notify(blank());
@@ -244,12 +246,14 @@
         return { ok: false, reason: 'unavailable' };
       }
 
+      var mainRemoved = false;
       try {
         box.removeItem(KEY);
+        mainRemoved = box.getItem(KEY) === null;
       } catch (e) {
         return { ok: false, reason: 'error' };
       }
-      if (box.getItem(KEY) !== null) {
+      if (!mainRemoved) {
         return { ok: false, reason: 'error' };
       }
 
