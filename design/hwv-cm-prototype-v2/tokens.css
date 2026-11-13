@@ -158,6 +158,7 @@ input, textarea { font-family: inherit; }
   align-items: center;
   justify-content: center;
   gap: 3px;
+  min-height: 44px;
   color: var(--muted);
   font-size: 10px;
   font-weight: 500;
