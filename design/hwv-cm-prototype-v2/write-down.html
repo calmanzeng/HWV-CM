@@ -26,6 +26,11 @@
     .form-card .q-no { color: var(--primary); font-size: var(--fs-xs); font-weight: 600; letter-spacing: .06em; }
     .form-card .q-title { margin-top: 4px; font-size: var(--fs-md); font-weight: 600; line-height: 1.45; }
     .sep-legend { margin-top: 14px; padding: 12px 14px; border-radius: var(--radius-md); background: var(--primary-soft); color: var(--primary-dark); font-size: var(--fs-sm); line-height: 1.65; }
+    .save-state { margin-top: 16px; color: var(--muted); font-size: var(--fs-xs); line-height: 1.6; text-align: center; }
+    .save-state.is-ok { color: var(--success); }
+    .save-state.is-warn { color: var(--danger); }
+    .storage-warn { margin-top: 16px; }
+    .storage-warn[hidden] { display: none; }
   </style>
 </head>
 <body>
@@ -41,6 +46,10 @@
     <h1 class="page-title">先把发生的事，分开写</h1>
     <p class="page-lede">不用写得好，也不用写得全。只记录你愿意整理的部分，不确定的地方可以写「我不知道」。</p>
 
+    <div class="callout callout-warn storage-warn" id="storage-warn" hidden>
+      <span>当前浏览器无法保存内容（可能处于隐私模式或已禁用本地存储）。本页写下的内容在离开后将丢失，请先处理这一点再继续。</span>
+    </div>
+
     <div class="steps flow">
       <span class="step-dot done"></span><span class="step-dot done"></span><span class="step-dot current"></span><span class="step-dot"></span><span class="step-dot"></span><span class="step-dot"></span><span class="step-dot"></span>
     </div>
@@ -50,6 +59,7 @@
         <div class="q-no">01 · 可以核对的事实</div>
         <p class="q-title">有哪些事情是你亲自看到、听到或可以核对的？</p>
         <div class="form-field" style="margin-top:10px">
+          <label for="facts" class="sr-only">可以核对的事实</label>
           <textarea class="textarea" id="facts" placeholder="例如：我们约好 18:00 见面，对方 18:30 到达。只写你能确认的部分。"></textarea>
         </div>
       </div>
@@ -57,6 +67,7 @@
         <div class="q-no">02 · 争议或未知</div>
         <p class="q-title">哪些内容还有争议，或你还不确定？</p>
         <div class="form-field" style="margin-top:10px">
+          <label for="disputed" class="sr-only">争议或未知</label>
           <textarea class="textarea" id="disputed" placeholder="把双方说法不一致的地方标出来，也可以写「我不知道」。"></textarea>
         </div>
       </div>
@@ -67,9 +78,11 @@
         <div class="q-no">03 · 我当时的感受与需要</div>
         <p class="q-title">你当时的感受是什么？你在意的是什么？</p>
         <div class="form-field" style="margin-top:10px">
+          <label for="feelings" class="sr-only">我当时的感受</label>
           <textarea class="textarea" id="feelings" placeholder="尽量写具体的感受，例如：失落、被忽略、担心……"></textarea>
         </div>
         <div class="form-field" style="margin-top:12px">
+          <label for="needs" class="sr-only">我在意的需要</label>
           <textarea class="textarea" id="needs" placeholder="我在意的需要：被尊重、安全感、可预期……也可以留空"></textarea>
         </div>
       </div>
@@ -77,6 +90,7 @@
         <div class="q-no">04 · 我的解释（不是事实）</div>
         <p class="q-title">你怎样理解对方的行为？这只是你的理解。</p>
         <div class="form-field" style="margin-top:10px">
+          <label for="interpretation" class="sr-only">我的解释</label>
           <textarea class="textarea" id="interpretation" placeholder="例如：「我把迟到理解为不被重视。」这不等同于对方的真实动机。"></textarea>
         </div>
       </div>
@@ -86,9 +100,10 @@
     </section>
 
     <div class="actions">
-      <a class="btn btn-primary btn-block" href="possibilities.html">写好了，继续</a>
-      <a class="btn btn-quiet btn-block" href="home.html">先保存，稍后再写</a>
+      <a class="btn btn-primary btn-block" href="possibilities.html" id="btn-next">写好了，继续</a>
+      <a class="btn btn-quiet btn-block" href="home.html" id="btn-save-quit">先保存，稍后再写</a>
     </div>
+    <p class="save-state" id="save-state" aria-live="polite">仅保存在本机</p>
     <p class="footer-note">记录只保存在本机；「感受与需要」会作为你叙述的一部分被保留，不会被当作事实或评分依据。</p>
   </main>
   <nav class="tabbar" aria-label="主导航">
@@ -99,5 +114,99 @@
     <a class="tab-item" href="reflect.html"><svg viewBox="0 0 24 24"><path d="M5 9h14v11H5zM6 3v4m12-4v4M8 14h3m-3 3h7"/></svg>成长</a>
   </nav>
 </div>
+<script src="store.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var FIELDS = ['facts', 'disputed', 'feelings', 'needs', 'interpretation'];
+  var S = window.HWVStore;
+  var statusEl = document.getElementById('save-state');
+  var warnEl = document.getElementById('storage-warn');
+  var timers = {};
+
+  function setStatus(text, kind) {
+    statusEl.textContent = text;
+    statusEl.className = 'save-state' + (kind ? ' is-' + kind : '');
+  }
+
+  function timeLabel(iso) {
+    try {
+      var d = new Date(iso);
+      if (isNaN(d.getTime())) return '';
+      var hh = ('0' + d.getHours()).slice(-2);
+      var mm = ('0' + d.getMinutes()).slice(-2);
+      return hh + ':' + mm;
+    } catch (e) {
+      return '';
+    }
+  }
+
+  if (!S || !S.available) {
+    warnEl.hidden = false;
+    setStatus('本页内容不会保存', 'warn');
+    return;
+  }
+
+  var state = S.read();
+  if (state.event) {
+    FIELDS.forEach(function (f) {
+      var el = document.getElementById(f);
+      if (el && typeof state.event[f] === 'string') el.value = state.event[f];
+    });
+    if (S.hasContent(state)) setStatus('已恢复上次保存的内容 · ' + timeLabel(state.updatedAt), 'ok');
+  }
+
+  function flush() {
+    var patch = {};
+    FIELDS.forEach(function (f) {
+      var el = document.getElementById(f);
+      patch[f] = el ? el.value : '';
+    });
+    var res = S.saveEvent(patch);
+    if (res.ok) {
+      setStatus('已保存到本机 · ' + timeLabel(res.state.updatedAt), 'ok');
+    } else {
+      warnEl.hidden = false;
+      setStatus('未能保存（浏览器存储不可用或已满）', 'warn');
+    }
+    return res.ok;
+  }
+
+  FIELDS.forEach(function (f) {
+    var el = document.getElementById(f);
+    if (!el) return;
+    el.addEventListener('input', function () {
+      setStatus('正在保存…', '');
+      clearTimeout(timers[f]);
+      timers[f] = setTimeout(flush, 400);
+    });
+    el.addEventListener('blur', function () {
+      clearTimeout(timers[f]);
+      flush();
+    });
+  });
+
+  document.getElementById('btn-next').addEventListener('click', function () {
+    FIELDS.forEach(function (f) { clearTimeout(timers[f]); });
+    flush();
+  });
+
+  document.getElementById('btn-save-quit').addEventListener('click', function () {
+    FIELDS.forEach(function (f) { clearTimeout(timers[f]); });
+    flush();
+  });
+
+  window.addEventListener('pagehide', function () {
+    FIELDS.forEach(function (f) { clearTimeout(timers[f]); });
+    var patch = {};
+    FIELDS.forEach(function (f) {
+      var el = document.getElementById(f);
+      patch[f] = el ? el.value : '';
+    });
+    S.saveEvent(patch);
+  });
+})();
+</script>
 </body>
 </html>
