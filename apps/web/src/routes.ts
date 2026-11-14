@@ -16,7 +16,12 @@ export const TAB_ITEMS: { key: TabKey; label: string; href: string }[] = [
   { key: 'reflect', label: '成长', href: '/reflect' },
 ];
 
-export const ROUTES: Record<string, RouteDef> = {
+/**
+ * ROUTES 用 satisfies 保留对象字面量的键类型：
+ * `keyof typeof ROUTES` 推导为 12 个路由路径的字面量联合，
+ * 供 App.tsx 的 V2_SCREENS 做编译期双向约束（漏注册即 tsc 失败）。
+ */
+export const ROUTES = {
   '/': { path: '/', title: '首页', tab: 'home' },
   '/know-self': { path: '/know-self', title: '认识自己', tab: 'know-self', backHref: '/' },
   '/profile': { path: '/profile', title: '个人档案', tab: 'know-self', backHref: '/know-self' },
@@ -40,9 +45,11 @@ export const ROUTES: Record<string, RouteDef> = {
     backHref: '/event-start',
     showTabs: false,
   },
-};
+} satisfies Record<string, RouteDef>;
+
+export type RoutePath = keyof typeof ROUTES;
 
 export function matchRoute(pathname: string): RouteDef | undefined {
   const normalized = pathname.replace(/\/+$/, '') || '/';
-  return ROUTES[normalized];
+  return normalized in ROUTES ? ROUTES[normalized as RoutePath] : undefined;
 }
