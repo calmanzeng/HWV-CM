@@ -193,6 +193,11 @@ button.button:disabled{opacity:.55;cursor:not-allowed;transform:none}button.butt
 .about-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin: 28px 0 22px; }
 .about-overview { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; align-items: stretch; }
 .about-intro, .data-manager, .disclaimer-card { padding: 22px; }
+.about-grid .data-manager { margin-top: 0; }
+.about-card > .about-principle { margin-top: 14px; }
+.about-intro > p, .disclaimer-card p { max-width: 620px; color: var(--ink-2); font-size: var(--font-size-sm); line-height: 1.7; }
+.about-intro > p:first-of-type { margin-top: 0; }
+.about-points { display: grid; gap: 7px; padding-left: 20px; color: var(--ink-2); font-size: var(--font-size-sm); line-height: 1.6; }
 .data-manager { margin-top: 18px; scroll-margin-top: 90px; }
 .data-actions { display: grid; gap: 10px; }
 .data-action { align-items: center; }
@@ -224,3 +229,4 @@ button.button:disabled{opacity:.55;cursor:not-allowed;transform:none}button.butt
 @media(max-width:920px){.about-overview,.evidence-grid{grid-template-columns:1fr}}
 @media(max-width:700px){.about-head{align-items:flex-start;flex-direction:column}.data-action{align-items:flex-start;flex-direction:column}.construct-row{flex-direction:column}.construct-side{display:flex;justify-items:start}.profile-grid{grid-template-columns:1fr}}
 @media(max-width:600px){.evidence-grid{grid-template-columns:1fr}.data-manager,.about-intro,.disclaimer-card{padding:18px}.review-options{grid-template-columns:1fr}}
+  
