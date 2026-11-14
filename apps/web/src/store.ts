@@ -26,11 +26,15 @@ export type EventDraft = {
   updatedAt: string;
 };
 
+export type ObservationCategory = 'common' | 'difference' | 'unknown';
+
 export type Observation = {
   id: string;
   text: string;
   confirmed: boolean;
   source: string;
+  /** 观察归类：共同点 / 差异 / 尚未验证。旧记录可能没有该字段。 */
+  category?: ObservationCategory;
   at: string;
 };
 
@@ -241,7 +245,7 @@ function randomId(prefix: string): string {
 export function addObservation(
   text: string,
   confirmed: boolean,
-  options: { id?: string; source?: string } = {},
+  options: { id?: string; source?: string; category?: ObservationCategory } = {},
 ): StoreResult {
   const state = read();
   const value = text.trim();
@@ -259,6 +263,7 @@ export function addObservation(
       text: value,
       confirmed: Boolean(confirmed),
       source: options.source ? String(options.source) : 'manual',
+      category: options.category ?? 'unknown',
       at: new Date().toISOString(),
     },
   ];

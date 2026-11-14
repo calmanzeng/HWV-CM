@@ -14,7 +14,9 @@ import SafetyCheckPage from './pages/SafetyCheckPage';
 import SafetyPage from './pages/SafetyPage';
 import HomeScreen from './screens/HomeScreen';
 import KnowSelfScreen from './screens/KnowSelfScreen';
+import MapScreen from './screens/MapScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import UnderstandScreen from './screens/UnderstandScreen';
 
 /**
  * v2 屏幕（移动端外壳）。已完成一屏就接入一屏；
@@ -24,6 +26,8 @@ const V2_SCREENS: Record<string, ReactNode> = {
   '/': <HomeScreen />,
   '/know-self': <KnowSelfScreen />,
   '/profile': <ProfileScreen />,
+  '/understand': <UnderstandScreen />,
+  '/map': <MapScreen />,
 };
 
 const LEGACY_ROUTES: Record<string, { label: string; page: ReactNode }> = {
