@@ -1,6 +1,6 @@
-import { useEffect, type ReactNode } from 'react';
+﻿import { useEffect, type ReactNode } from 'react';
 import { PageFrame } from './components/Layout';
-import { guardRoute, transitionEvent } from './eventMachine';
+import { guardRoute } from './eventMachine';
 import { useAppState } from './useWorkspace';
 import AboutPage from './pages/AboutPage';
 import EventConsentPage from './pages/EventConsentPage';
@@ -11,12 +11,14 @@ import HomePage from './pages/HomePage';
 import RelationshipPage from './pages/RelationshipPage';
 import ReportPage from './pages/ReportPage';
 import SafetyCheckPage from './pages/SafetyCheckPage';
-import SafetyPage from './pages/SafetyPage';
+import EventStartScreen from './screens/EventStartScreen';
 import HomeScreen from './screens/HomeScreen';
 import KnowSelfScreen from './screens/KnowSelfScreen';
 import MapScreen from './screens/MapScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import SafetyScreen from './screens/SafetyScreen';
 import UnderstandScreen from './screens/UnderstandScreen';
+import WriteDownScreen from './screens/WriteDownScreen';
 
 /**
  * v2 屏幕（移动端外壳）。已完成一屏就接入一屏；
@@ -28,6 +30,9 @@ const V2_SCREENS: Record<string, ReactNode> = {
   '/profile': <ProfileScreen />,
   '/understand': <UnderstandScreen />,
   '/map': <MapScreen />,
+  '/event-start': <EventStartScreen />,
+  '/write-down': <WriteDownScreen />,
+  '/safety': <SafetyScreen />,
 };
 
 const LEGACY_ROUTES: Record<string, { label: string; page: ReactNode }> = {
@@ -37,7 +42,6 @@ const LEGACY_ROUTES: Record<string, { label: string; page: ReactNode }> = {
   '/event': { label: '私密叙述', page: <EventIntakePage /> },
   '/event-map': { label: '核对假设', page: <EventMapPage /> },
   '/report': { label: '整理结果', page: <ReportPage /> },
-  '/safety': { label: '安全支持', page: <SafetyPage /> },
   '/follow-up': { label: '约定与复盘', page: <FollowUpPage /> },
   '/about': { label: '关于与数据', page: <AboutPage /> },
   '/home-legacy': { label: '首页', page: <HomePage /> },
@@ -49,23 +53,12 @@ function normalizePath(): string {
 
 function LegacyApp({ path }: { path: string }) {
   const route = LEGACY_ROUTES[path];
-  const { activeEvent, storageError, safeMode, updateEvent } = useAppState();
+  const { activeEvent, storageError, safeMode } = useAppState();
   const redirect = guardRoute(path, activeEvent);
 
   useEffect(() => {
     if (redirect) window.location.replace(redirect);
   }, [redirect]);
-
-  useEffect(() => {
-    if (path === '/safety' && activeEvent?.consentAcceptedAt && activeEvent.status !== 'SAFETY_SUPPORT') {
-      try {
-        const supportEvent = transitionEvent(activeEvent, 'SAFETY_SUPPORT');
-        updateEvent(activeEvent.id, (event) => ({ ...supportEvent, safetyDecision: 'support' }));
-      } catch {
-        updateEvent(activeEvent.id, (event) => ({ ...event, status: 'SAFETY_SUPPORT', safetyDecision: 'support' }));
-      }
-    }
-  }, [path, activeEvent?.id, activeEvent?.status, activeEvent?.consentAcceptedAt, updateEvent]);
 
   let page = route?.page ?? (
     <section className="card card-pad">
