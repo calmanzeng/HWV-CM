@@ -1,6 +1,7 @@
-﻿import { useEffect, type ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { PageFrame } from './components/Layout';
 import { guardRoute } from './eventMachine';
+import { ROUTES, type RoutePath } from './routes';
 import { useAppState } from './useWorkspace';
 import AboutPage from './pages/AboutPage';
 import EventConsentPage from './pages/EventConsentPage';
@@ -11,22 +12,25 @@ import HomePage from './pages/HomePage';
 import RelationshipPage from './pages/RelationshipPage';
 import ReportPage from './pages/ReportPage';
 import SafetyCheckPage from './pages/SafetyCheckPage';
+import AgreementScreen from './screens/AgreementScreen';
 import EventStartScreen from './screens/EventStartScreen';
 import HomeScreen from './screens/HomeScreen';
 import KnowSelfScreen from './screens/KnowSelfScreen';
 import MapScreen from './screens/MapScreen';
 import PossibilitiesScreen from './screens/PossibilitiesScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import ReflectScreen from './screens/ReflectScreen';
 import ResultsScreen from './screens/ResultsScreen';
 import SafetyScreen from './screens/SafetyScreen';
 import UnderstandScreen from './screens/UnderstandScreen';
 import WriteDownScreen from './screens/WriteDownScreen';
 
 /**
- * v2 屏幕（移动端外壳）。已完成一屏就接入一屏；
- * 未接入的路径继续走下方 v1 流程，保证任何时刻整站都是可用的。
+ * v2 屏幕（移动端外壳）。V2_SCREENS 的键集合在编译期由 routes.ts 的 ROUTES
+ * 强制双向一致（satisfies Record<RoutePath, ReactNode>）：新增路由但漏注册屏幕、
+ * 或屏幕键不在 ROUTES，都会使 `tsc --noEmit` 失败，生产构建同样受约束。
  */
-const V2_SCREENS: Record<string, ReactNode> = {
+const V2_SCREENS = {
   '/': <HomeScreen />,
   '/know-self': <KnowSelfScreen />,
   '/profile': <ProfileScreen />,
@@ -36,8 +40,13 @@ const V2_SCREENS: Record<string, ReactNode> = {
   '/write-down': <WriteDownScreen />,
   '/possibilities': <PossibilitiesScreen />,
   '/results': <ResultsScreen />,
+  '/agreement': <AgreementScreen />,
+  '/reflect': <ReflectScreen />,
   '/safety': <SafetyScreen />,
-};
+
+} satisfies Record<RoutePath, ReactNode>;
+
+type V2Path = RoutePath;
 
 const LEGACY_ROUTES: Record<string, { label: string; page: ReactNode }> = {
   '/relationship': { label: '关系', page: <RelationshipPage /> },
@@ -119,7 +128,9 @@ function LegacyApp({ path }: { path: string }) {
 
 export default function App() {
   const path = normalizePath();
-  const screen = V2_SCREENS[path];
+  const screen = Object.prototype.hasOwnProperty.call(V2_SCREENS, path)
+    ? V2_SCREENS[path as V2Path]
+    : null;
   if (screen) return <>{screen}</>;
   return <LegacyApp path={path} />;
 }
