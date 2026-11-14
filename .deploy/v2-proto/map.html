@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="dsh-design" content="app">
+  <title>关系差异地图 · HWV-CM 人文关怀版</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    .map-head { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+    .section-gap { margin-top: 20px; }
+    .obs { padding: var(--sp-5); }
+    .obs h3 { font-size: var(--fs-md); font-weight: 600; }
+    .obs .meta { margin-top: 4px; color: var(--muted); font-size: var(--fs-xs); }
+    .obs .body { margin-top: 10px; color: var(--ink-2); font-size: var(--fs-base); line-height: 1.7; }
+    .obs .src { margin-top: 10px; font-size: var(--fs-xs); color: var(--primary-dark); }
+    .tag-pending { background: var(--warning-soft); color: #7c4526; }
+    .add-btn { margin-top: 14px; }
+    .boundary { margin-top: 20px; padding: 14px 16px; border-radius: var(--radius-md); background: var(--surface-muted); color: var(--ink-2); font-size: var(--fs-xs); line-height: 1.7; }
+    .obs-empty { color: var(--muted); font-size: var(--fs-sm); line-height: 1.7; padding: 10px 0; }
+    .notice { margin-top: 12px; color: var(--muted); font-size: var(--fs-sm); line-height: 1.6; }
+    .notice.is-ok { color: var(--success); }
+    .notice.is-warn { color: var(--danger); }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="statusbar"><span>9:41</span><span class="sb-icons">▂▄▆ ▮</span></div>
+  <header class="topbar">
+    <a class="back" href="understand.html"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>返回</a>
+    <span class="topbar-title">关系差异地图</span>
+  </header>
+  <main class="content">
+    <div class="eyebrow">关系探索 · 单人观察</div>
+    <div class="map-head">
+      <h1 class="page-title" style="margin-top:4px">我的观察</h1>
+      <span class="pill">未经对方确认</span>
+    </div>
+    <p class="page-lede">以下全部来自你自己的观察与感受，不代表双方共同结论。每一条都可以修改或删除。</p>
+    <p class="section-note" style="margin-top:10px">下面三张卡是原型示例，用来说明分类方式；你自己添加的观察会单独列在「我添加的观察」里。</p>
+
+    <section class="card obs section-gap">
+      <h3>可能存在的共同点</h3>
+      <div class="list-item"><span class="dot"></span>
+        <div><p class="body">我们都希望冲突后当天能把话说完，不想冷战过夜。</p><div class="src">来源：本人对事件的反思 · <span class="pill tag-pending">待验证</span></div></div>
+      </div>
+    </section>
+
+    <section class="card obs section-gap">
+      <h3>我感受到的差异</h3>
+      <div class="list-item"><span class="dot"></span>
+        <div><p class="body">我倾向于先讲感受，对方似乎更想先讲解决办法。</p><div class="src">来源：我自己的观察 · <span class="pill tag-pending">待验证</span></div></div>
+      </div>
+      <div class="list-item"><span class="dot"></span>
+        <div><p class="body">我需要提前约时间，对方更习惯临时安排。</p><div class="src">来源：我自己的观察 · <span class="pill tag-pending">待验证</span></div></div>
+      </div>
+    </section>
+
+    <section class="card obs section-gap">
+      <h3>尚未验证的问题</h3>
+      <div class="list-item"><span class="dot"></span>
+        <div><p class="body">我不确定对方在争执中没有回应，是不是在回避，还是需要时间消化。</p><div class="src">状态：<span class="pill tag-pending">本人未确认</span></div></div>
+      </div>
+    </section>
+
+    <section class="card obs section-gap" id="add-panel">
+      <h3>添加一条我自己的观察</h3>
+      <div class="form-field" style="margin-top:10px">
+        <label for="obs-input">我观察到 / 我感受到</label>
+        <textarea class="textarea" id="obs-input" placeholder="例如：我注意到对方在争执中会先沉默一会儿。只写我自己的观察，不写对方的动机。"></textarea>
+      </div>
+      <div class="actions" style="margin-top:14px">
+        <button type="button" class="btn btn-primary btn-block" id="btn-add-obs">保存这条观察</button>
+      </div>
+      <p class="notice" id="obs-notice" aria-live="polite"></p>
+    </section>
+
+    <section class="card obs section-gap">
+      <h3>我添加的观察</h3>
+      <div id="my-obs">
+        <p class="obs-empty">还没有添加。保存后会出现在这里，并始终标记为「待验证」。</p>
+      </div>
+    </section>
+
+    <div class="boundary">
+      <strong>边界说明：</strong>以上均为本人单方面观察与推测，不得表述为双方共同点或结论。若未来开放双人模式，须双方独立输入并分别授权后才能比较。
+    </div>
+  </main>
+  <nav class="tabbar" aria-label="主导航">
+    <a class="tab-item" href="home.html"><svg viewBox="0 0 24 24"><path d="m3.5 10.5 8.5-7 8.5 7v9a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg>首页</a>
+    <a class="tab-item" href="know-self.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3.2"/><path d="M5.5 20c.5-3.4 2.7-5.2 6.5-5.2s6 1.8 6.5 5.2"/></svg>认识自己</a>
+    <a class="tab-item active" href="understand.html"><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="15" r="3"/><path d="M10.2 11.2 13.8 13.8"/></svg>理解彼此</a>
+    <a class="tab-item" href="event-start.html"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h4"/></svg>一件事</a>
+    <a class="tab-item" href="reflect.html"><svg viewBox="0 0 24 24"><path d="M5 9h14v11H5zM6 3v4m12-4v4M8 14h3m-3 3h7"/></svg>成长</a>
+  </nav>
+</div>
+<script src="store.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var S = window.HWVStore;
+  var input = document.getElementById('obs-input');
+  var list = document.getElementById('my-obs');
+  var notice = document.getElementById('obs-notice');
+  var pendingId = null;
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function setNotice(text, kind) {
+    notice.textContent = text || '';
+    notice.className = 'notice' + (kind ? ' is-' + kind : '');
+  }
+
+  function render() {
+    if (!S || !S.available) {
+      list.innerHTML = '<p class="obs-empty">当前浏览器无法读取记录，这里无法显示你保存的观察。</p>';
+      return;
+    }
+    var obs = (S.read().observations || []).slice().reverse();
+    if (!obs.length) {
+      list.innerHTML = '<p class="obs-empty">还没有添加。保存后会出现在这里，并始终标记为「待验证」。</p>';
+      return;
+    }
+    list.innerHTML = obs.map(function (o) {
+      var tag = o.confirmed
+        ? '<span class="pill" style="margin-top:6px">本人已确认</span>'
+        : '<span class="pill tag-pending" style="margin-top:6px">待验证</span>';
+      return '<div class="list-item"><span class="dot"></span><div>' +
+        '<p class="body" style="font-size:var(--fs-sm);line-height:1.7">' + esc(o.text) + '</p>' +
+        '<div class="src">来源：本人观察 · ' + tag + '</div></div></div>';
+    }).join('');
+  }
+
+  input.addEventListener('input', function () {
+    if (!pendingId) {
+      pendingId = 'map-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+    }
+  });
+
+  document.getElementById('btn-add-obs').addEventListener('click', function () {
+    var text = (input.value || '').trim();
+    if (!text) {
+      setNotice('先写下一条你观察到的内容。', 'warn');
+      input.focus();
+      return;
+    }
+    if (!S || !S.available) {
+      setNotice('当前浏览器无法保存这条观察。', 'warn');
+      return;
+    }
+    if (!pendingId) {
+      pendingId = 'map-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+    }
+    var res = S.addObservation(text, false, { id: pendingId, source: 'map' });
+    if (!res.ok) {
+      setNotice('保存失败：浏览器存储不可用或已满。', 'warn');
+      return;
+    }
+    if (res.reason === 'duplicate') {
+      setNotice('这条观察已经保存过，不会重复添加。', '');
+      return;
+    }
+    pendingId = null;
+    input.value = '';
+    setNotice('已保存。它仍然只是你的观察，不是双方结论。', 'ok');
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

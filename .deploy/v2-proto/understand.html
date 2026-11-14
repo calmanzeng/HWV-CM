@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="dsh-design" content="app">
+  <title>理解彼此 · HWV-CM 人文关怀版</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    .intro { margin-top: 20px; padding: var(--sp-5); }
+    .intro h2 { font-size: var(--fs-md); font-weight: 600; }
+    .intro p { margin-top: 6px; color: var(--ink-2); font-size: var(--fs-sm); line-height: 1.65; }
+    .unknown-note { margin-top: 14px; padding: 13px 14px; border-radius: var(--radius-md); background: var(--primary-soft); color: var(--primary-dark); font-size: var(--fs-sm); line-height: 1.6; }
+    .entry { margin-top: 12px; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="statusbar"><span>9:41</span><span class="sb-icons">▂▄▆ ▮</span></div>
+  <header class="topbar">
+    <a class="back" href="home.html"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>返回</a>
+    <span class="topbar-title">理解彼此</span>
+    <span class="pill">单人模式</span>
+  </header>
+  <main class="content">
+    <div class="eyebrow">关系探索</div>
+    <h1 class="page-title">看见差异，不替对方说话</h1>
+    <p class="page-lede">这里只整理你自己的观察。对方的想法，除非对方亲自说明，否则我们会保持「未知」——不猜测，也不替他下结论。</p>
+
+    <section class="card intro">
+      <h2>双人模式暂未开放</h2>
+      <p>当前版本只支持单人视角：你可以记录自己的观察、认为可能存在的共同点、感受到的差异，以及尚未验证的问题。双方共同输入、授权比较、共享数据都是未来预留能力，v2 不提供。</p>
+      <div class="unknown-note">缺席方的感受、需要与动机仍未知。这不是缺陷，而是对彼此边界的尊重。</div>
+    </section>
+
+    <a class="card entry entry-card" href="map.html">
+      <span class="entry-icon"><svg viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Zm0 0v14m6-12v14"/></svg></span>
+      <span class="entry-copy"><h3>关系差异地图</h3><p>查看我目前记录下来的观察与待验证问题。</p></span>
+      <span class="entry-arrow">›</span>
+    </a>
+
+    <div class="footer-note" style="margin-top:20px">提示：记录差异时，多用「我观察到」「我感受到」，少用「他总是」「他就是」。</div>
+  </main>
+  <nav class="tabbar" aria-label="主导航">
+    <a class="tab-item" href="home.html"><svg viewBox="0 0 24 24"><path d="m3.5 10.5 8.5-7 8.5 7v9a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg>首页</a>
+    <a class="tab-item" href="know-self.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3.2"/><path d="M5.5 20c.5-3.4 2.7-5.2 6.5-5.2s6 1.8 6.5 5.2"/></svg>认识自己</a>
+    <a class="tab-item active" href="understand.html"><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="15" r="3"/><path d="M10.2 11.2 13.8 13.8"/></svg>理解彼此</a>
+    <a class="tab-item" href="event-start.html"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h4"/></svg>一件事</a>
+    <a class="tab-item" href="reflect.html"><svg viewBox="0 0 24 24"><path d="M5 9h14v11H5zM6 3v4m12-4v4M8 14h3m-3 3h7"/></svg>成长</a>
+  </nav>
+</div>
+</body>
+</html>

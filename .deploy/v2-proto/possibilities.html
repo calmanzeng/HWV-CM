@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="dsh-design" content="app">
+  <title>看见不同可能 · HWV-CM 人文关怀版</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    .flow { margin-top: 18px; }
+    .h-card { margin-top: 14px; }
+    .h-actions { display: grid; gap: 10px; margin-top: 4px; }
+    .h-actions .act { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: var(--radius-md); background: var(--surface); font-size: var(--fs-base); color: var(--ink); cursor: pointer; }
+    .h-actions .act .r { width: 19px; height: 19px; flex: 0 0 19px; border: 1.5px solid var(--muted); border-radius: 50%; display: grid; place-items: center; }
+    .h-actions .act .r::after { content: ""; width: 9px; height: 9px; border-radius: 50%; background: transparent; }
+    .h-actions .act.sel { border-color: var(--primary); background: var(--primary-soft); }
+    .h-actions .act.sel .r { border-color: var(--primary); }
+    .h-actions .act.sel .r::after { background: var(--primary); }
+    .h-actions .form-field { grid-column: 1 / -1; }
+    .revise { margin-top: 12px; display: grid; gap: 8px; }
+    .confirm-note { margin-top: 18px; }
+    .h-actions .form-field[hidden] { display: none; }
+    .notice { margin-top: 12px; color: var(--danger); font-size: var(--fs-sm); line-height: 1.6; }
+    .notice:empty { display: none; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="statusbar"><span>9:41</span><span class="sb-icons">▂▄▆ ▮</span></div>
+  <header class="topbar">
+    <a class="back" href="write-down.html"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>返回</a>
+    <span class="topbar-title">看见不同可能</span>
+    <a class="link" href="home.html" style="min-height:44px;display:flex;align-items:center">退出</a>
+  </header>
+  <main class="content">
+    <div class="eyebrow">事件梳理 · 不同理解</div>
+    <h1 class="page-title">这些只是「可能」，不是结论</h1>
+    <p class="page-lede">系统根据你的叙述整理出下面几条待验证的假设。请逐条看过：它贴近你的体验吗？需要修改吗？还是保留为未知？</p>
+
+    <div class="steps flow">
+      <span class="step-dot done"></span><span class="step-dot done"></span><span class="step-dot done"></span><span class="step-dot current"></span><span class="step-dot"></span><span class="step-dot"></span>
+    </div>
+
+    <section class="card hypothesis-card h-card">
+      <h3>这次事件里，什么需要对我比较重要？</h3>
+      <p class="basis">你写下的需要是：「被尊重与可预期」。这是否贴近你的体验？</p>
+      <p class="unknown">缺席方的感受、需要与动机仍未知——除非对方亲自说明。</p>
+      <div class="h-actions" data-hyp="self">
+        <button class="act" type="button" data-choice="fit"><span class="r"></span>贴近我的体验</button>
+        <button class="act" type="button" data-choice="revise"><span class="r"></span>不完全贴切，我想修改</button>
+        <div class="form-field" hidden><textarea class="textarea" id="rev-self" placeholder="写下更贴切的表达……"></textarea></div>
+        <button class="act" type="button" data-choice="unknown"><span class="r"></span>保留为未知，不整理</button>
+      </div>
+    </section>
+
+    <section class="card hypothesis-card h-card">
+      <h3>我的解释，是否准确表达了当时的理解？</h3>
+      <p class="basis">你写下的解释是：「把迟到理解为不被重视」。它是你的理解，不是对他人动机的证明。</p>
+      <p class="unknown">对方当时的原因与意图，除非本人说明，否则未知。</p>
+      <div class="h-actions" data-hyp="meaning">
+        <button class="act" type="button" data-choice="fit"><span class="r"></span>这是我的理解</button>
+        <button class="act" type="button" data-choice="revise"><span class="r"></span>不完全贴切，我想修改</button>
+        <div class="form-field" hidden><textarea class="textarea" id="rev-meaning" placeholder="写下更贴切的表达……"></textarea></div>
+        <button class="act" type="button" data-choice="unknown"><span class="r"></span>保留为未知，不整理</button>
+      </div>
+    </section>
+
+    <div class="callout confirm-note">
+      <span>只有当你确认上面的说法（或明确保留为未知）后，才会生成三份整理结果。修改后的内容会标记为你本人的修订。</span>
+    </div>
+    <p class="notice" id="confirm-notice" aria-live="polite"></p>
+
+    <div class="actions">
+      <a class="btn btn-primary btn-block" href="results.html" id="btn-confirm">我确认过了，生成整理结果</a>
+      <a class="btn btn-quiet btn-block" href="write-down.html">回上一步修改叙述</a>
+    </div>
+  </main>
+  <nav class="tabbar" aria-label="主导航">
+    <a class="tab-item" href="home.html"><svg viewBox="0 0 24 24"><path d="m3.5 10.5 8.5-7 8.5 7v9a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg>首页</a>
+    <a class="tab-item" href="know-self.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3.2"/><path d="M5.5 20c.5-3.4 2.7-5.2 6.5-5.2s6 1.8 6.5 5.2"/></svg>认识自己</a>
+    <a class="tab-item" href="understand.html"><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="15" r="3"/><path d="M10.2 11.2 13.8 13.8"/></svg>理解彼此</a>
+    <a class="tab-item active" href="event-start.html"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h4"/></svg>一件事</a>
+    <a class="tab-item" href="reflect.html"><svg viewBox="0 0 24 24"><path d="M5 9h14v11H5zM6 3v4m12-4v4M8 14h3m-3 3h7"/></svg>成长</a>
+  </nav>
+</div>
+<script src="store.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var S = window.HWVStore;
+  var KEY = 'possibilities';
+  var notice = document.getElementById('confirm-notice');
+  var groups = Array.prototype.slice.call(document.querySelectorAll('.h-actions'));
+  var state = { self: null, meaning: null };
+
+  function say(text) { notice.textContent = text || ''; }
+
+  function valid(entry) {
+    if (!entry || !entry.choice) return false;
+    if (entry.choice === 'revise') return !!(entry.text && entry.text.trim());
+    return true;
+  }
+
+  function paint(hyp) {
+    var group = document.querySelector('.h-actions[data-hyp="' + hyp + '"]');
+    if (!group) return;
+    var current = state[hyp];
+    var choice = current ? current.choice : null;
+    Array.prototype.slice.call(group.querySelectorAll('.act')).forEach(function (btn) {
+      btn.classList.toggle('sel', btn.getAttribute('data-choice') === choice);
+    });
+    var field = group.querySelector('.form-field');
+    var area = group.querySelector('textarea');
+    if (field) field.hidden = choice !== 'revise';
+    if (area && current && typeof current.text === 'string' && area.value !== current.text) {
+      area.value = current.text;
+    }
+  }
+
+  function persist() {
+    if (!S || !S.available) return false;
+    var res = S.saveExtra(KEY, state);
+    return !!(res && res.ok);
+  }
+
+  groups.forEach(function (group) {
+    var hyp = group.getAttribute('data-hyp');
+    var area = group.querySelector('textarea');
+
+    Array.prototype.slice.call(group.querySelectorAll('.act')).forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var choice = btn.getAttribute('data-choice');
+        state[hyp] = { choice: choice, text: area ? area.value : '' };
+        say('');
+        paint(hyp);
+        if (!persist()) say('刚才的选择没能保存到本机，你可以再点一次。');
+      });
+    });
+
+    if (area) {
+      area.addEventListener('input', function () {
+        if (!state[hyp]) state[hyp] = { choice: 'revise', text: '' };
+        state[hyp].text = area.value;
+        say('');
+        persist();
+      });
+    }
+  });
+
+  if (S && S.available) {
+    var saved = S.readExtra(KEY);
+    if (saved && typeof saved === 'object') {
+      if (saved.self) state.self = saved.self;
+      if (saved.meaning) state.meaning = saved.meaning;
+    }
+  }
+  paint('self');
+  paint('meaning');
+
+  document.getElementById('btn-confirm').addEventListener('click', function (e) {
+    var reviseEmpty = false;
+    ['self', 'meaning'].forEach(function (h) {
+      var entry = state[h];
+      if (entry && entry.choice === 'revise' && !(entry.text && entry.text.trim())) reviseEmpty = true;
+    });
+    if (reviseEmpty) {
+      e.preventDefault();
+      say('你有一条假设选了「我想修改」，但修改内容还是空的。请写一句，或改选「保留为未知」。');
+      return;
+    }
+
+    if (!valid(state.self) || !valid(state.meaning)) {
+      e.preventDefault();
+      say('请先为两条假设分别做出选择。选「保留为未知」也算明确的选择。');
+      return;
+    }
+
+    if (!persist()) {
+      e.preventDefault();
+      say('当前无法把选择保存到本机，先不生成整理结果。请检查浏览器存储后再试。');
+      return;
+    }
+
+    say('');
+  });
+})();
+</script>
+</body>
+</html>

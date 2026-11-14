@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="dsh-design" content="app">
+  <title>安全支持 · HWV-CM 人文关怀版</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    .support { margin-top: 20px; padding: var(--sp-5); }
+    .support .icon { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 15px; background: var(--warning-soft); color: var(--warning); }
+    .support .icon svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; }
+    .support h2 { margin-top: 14px; font-size: var(--fs-xl); font-weight: 700; line-height: 1.4; }
+    .support .copy { margin-top: 10px; color: var(--ink-2); font-size: var(--fs-base); line-height: 1.75; }
+    .note { margin-top: 16px; padding: 13px 14px; border-radius: var(--radius-md); background: var(--surface-muted); font-size: var(--fs-sm); color: var(--ink-2); line-height: 1.7; }
+    #safety-context { margin-top: 14px; padding: 12px 14px; border-radius: var(--radius-md); background: var(--primary-soft); color: var(--primary-dark); font-size: var(--fs-sm); line-height: 1.65; }
+    #safety-context[hidden] { display: none; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="statusbar"><span>9:41</span><span class="sb-icons">▂▄▆ ▮</span></div>
+  <header class="topbar">
+    <a class="back" href="event-start.html"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>返回</a>
+    <span class="topbar-title">安全支持</span>
+  </header>
+  <main class="content">
+    <section class="card support">
+      <div class="icon">
+        <svg viewBox="0 0 24 24"><path d="M12 3 21 19H3L12 3Zm0 7v4m0 3h.01"/></svg>
+      </div>
+      <h2>你的安全，比任何一件事都重要</h2>
+      <p class="copy">如果你担心继续记录会带来威胁、控制、报复或任何人身风险，请先停下来。这里不会逼你继续，也不会替你联系任何人。</p>
+      <p id="safety-context" hidden></p>
+      <div class="note">
+        <strong>你可以这样做：</strong><br>
+        · 联系你信任的人，请他们陪你聊聊；<br>
+        · 在你方便的时候，向当地可信的支持资源求助；<br>
+        · 暂时离开这个流程，保存好已写的内容或直接删除。<br><br>
+        本产品不提供、也不编造任何热线号码。请自行核实当地可靠渠道。
+      </div>
+      <div class="actions">
+        <a class="btn btn-danger-soft btn-block" id="btn-stop" href="home.html">停止并回到首页</a>
+        <a class="btn btn-quiet btn-block" id="btn-resume" href="event-start.html?reset=1">我准备好后再继续</a>
+      </div>
+      <p class="footer-note">流程会停留在这里。「我准备好后再继续」将返回上一步并重新进行安全检查，不会沿用这次的结论。</p>
+    </section>
+  </main>
+  <nav class="tabbar" aria-label="主导航">
+    <a class="tab-item active" href="home.html"><svg viewBox="0 0 24 24"><path d="m3.5 10.5 8.5-7 8.5 7v9a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg>首页</a>
+    <a class="tab-item" href="know-self.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3.2"/><path d="M5.5 20c.5-3.4 2.7-5.2 6.5-5.2s6 1.8 6.5 5.2"/></svg>认识自己</a>
+    <a class="tab-item" href="understand.html"><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="15" r="3"/><path d="M10.2 11.2 13.8 13.8"/></svg>理解彼此</a>
+    <a class="tab-item" href="event-start.html"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h4"/></svg>一件事</a>
+    <a class="tab-item" href="reflect.html"><svg viewBox="0 0 24 24"><path d="M5 9h14v11H5zM6 3v4m12-4v4M8 14h3m-3 3h7"/></svg>成长</a>
+  </nav>
+</div>
+<script>
+(function () {
+  'use strict';
+  var SAFETY_KEY = 'hwv.flow.safety';
+  var TEXT = {
+    worried: '你刚才选择的是「我有一些担忧或不确定」，所以流程先停在这里。',
+    stop: '你刚才选择的是「我现在不想继续」，所以流程先停在这里。'
+  };
+  var ctx = document.getElementById('safety-context');
+  var stopBtn = document.getElementById('btn-stop');
+
+  var storage = (function () {
+    try {
+      window.sessionStorage.setItem('hwv.probe', '1');
+      window.sessionStorage.removeItem('hwv.probe');
+      return window.sessionStorage;
+    } catch (e) {
+      return null;
+    }
+  })();
+
+  var value = null;
+  try { value = storage ? storage.getItem(SAFETY_KEY) : null; } catch (e) { value = null; }
+
+  if (value && TEXT[value]) {
+    ctx.textContent = TEXT[value];
+    ctx.hidden = false;
+  }
+
+  stopBtn.addEventListener('click', function () {
+    try { if (storage) storage.removeItem(SAFETY_KEY); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>

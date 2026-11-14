@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="dsh-design" content="app">
+  <title>回顾成长 · HWV-CM 人文关怀版</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    .review-card { margin-top: 16px; padding: var(--sp-5); display: grid; gap: 16px; }
+    .review-card .q-no { color: var(--primary); font-size: var(--fs-xs); font-weight: 600; letter-spacing: .06em; }
+    .review-card .q-title { margin-top: 4px; font-size: var(--fs-md); font-weight: 600; line-height: 1.45; }
+    .growth { margin-top: 16px; padding: var(--sp-5); }
+    .growth h3 { font-size: var(--fs-md); font-weight: 600; }
+    .growth-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; }
+    .growth-item + .growth-item { border-top: 1px solid var(--line); }
+    .writeback-block { margin-top: 16px; padding: var(--sp-5); }
+    .writeback-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; }
+    .switch-wrap { position: relative; display: inline-flex; width: 48px; height: 28px; flex: 0 0 48px; }
+    .switch-input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; z-index: 2; }
+    .switch { position: relative; width: 48px; height: 28px; border-radius: 999px; background: var(--line); transition: background 160ms; }
+    .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(38,48,42,.25); transition: transform 160ms; }
+    .switch-input:checked + .switch { background: var(--primary); }
+    .switch-input:checked + .switch::after { transform: translateX(20px); }
+    .switch-input:focus-visible + .switch { outline: 2px solid var(--primary); outline-offset: 2px; }
+    .empty-note { color: var(--muted); font-size: var(--fs-sm); line-height: 1.7; padding: 10px 0; }
+    .notice { margin-top: 12px; color: var(--muted); font-size: var(--fs-sm); line-height: 1.6; }
+    .notice.is-warn { color: var(--danger); }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="statusbar"><span>9:41</span><span class="sb-icons">▂▄▆ ▮</span></div>
+  <header class="topbar">
+    <a class="back" href="home.html"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>返回</a>
+    <span class="topbar-title">回顾成长</span>
+  </header>
+  <main class="content">
+    <div class="eyebrow">成长 · 复盘与记录</div>
+    <h1 class="page-title">看见变化，也看见困难</h1>
+    <p class="page-lede">复盘不是打分。它只是回头看看：当初想改善什么、现在怎么样了、你自己有哪些新的认识。</p>
+
+    <section class="card review-card">
+      <div>
+        <div class="q-no">01</div>
+        <p class="q-title">当初，你希望改善的是什么？</p>
+        <div class="form-field" style="margin-top:10px">
+          <textarea class="textarea" id="r1" placeholder="例如：我希望见面更守时，能提前说明。"></textarea>
+        </div>
+      </div>
+      <div>
+        <div class="q-no">02</div>
+        <p class="q-title">实际发生了什么？哪些事情有变化？</p>
+        <div class="form-field" style="margin-top:10px">
+          <textarea class="textarea" id="r2" placeholder="可以写有变化的，也可以写没有变化的。"></textarea>
+        </div>
+      </div>
+      <div>
+        <div class="q-no">03</div>
+        <p class="q-title">哪些地方仍然困难？你现在怎么看待它？</p>
+        <div class="form-field" style="margin-top:10px">
+          <textarea class="textarea" id="r3" placeholder="承认困难也是一种看见。"></textarea>
+        </div>
+      </div>
+      <div>
+        <div class="q-no">04</div>
+        <p class="q-title">这之后，你对自己有什么新的认识？</p>
+        <div class="form-field" style="margin-top:10px">
+          <textarea class="textarea" id="r4" placeholder="例如：我发现自己更需要提前约定，而不是临时安排。"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="card growth">
+      <h3>成长记录</h3>
+      <div id="growth-list">
+        <p class="empty-note">还没有写入档案的认识。完成一次回顾并主动确认后，才会出现在这里。</p>
+      </div>
+    </section>
+
+    <section class="card writeback-block">
+      <h3>是否回写个人档案？</h3>
+      <p style="margin-top:6px;color:var(--ink-2);font-size:var(--fs-sm);line-height:1.65">如果这次复盘让你更了解自己，可以选择把一条新的认识写进档案。这一步需要你主动确认。</p>
+      <div class="writeback-row">
+        <label class="writeback-label" for="writeback" style="font-size:var(--fs-base);font-weight:600">把新认识写入档案</label>
+        <label class="switch-wrap">
+          <input type="checkbox" id="writeback" class="switch-input">
+          <span class="switch" aria-hidden="true"></span>
+        </label>
+      </div>
+      <p class="notice" id="writeback-notice" aria-live="polite"></p>
+      <div class="callout" style="margin-top:12px">档案只保存在本机；产品内不存在任何共享路径。双人共享与授权机制为未来预留，v2 不产生。</div>
+    </section>
+
+    <div class="actions">
+      <a class="btn btn-primary btn-block" href="home.html" id="btn-done">完成本次回顾</a>
+      <a class="btn btn-soft btn-block" href="agreement.html">回去看我的约定</a>
+    </div>
+    <p class="footer-note">复盘不产生评分，不评价你做得够不够好。</p>
+  </main>
+  <nav class="tabbar" aria-label="主导航">
+    <a class="tab-item" href="home.html"><svg viewBox="0 0 24 24"><path d="m3.5 10.5 8.5-7 8.5 7v9a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg>首页</a>
+    <a class="tab-item" href="know-self.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3.2"/><path d="M5.5 20c.5-3.4 2.7-5.2 6.5-5.2s6 1.8 6.5 5.2"/></svg>认识自己</a>
+    <a class="tab-item" href="understand.html"><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="15" r="3"/><path d="M10.2 11.2 13.8 13.8"/></svg>理解彼此</a>
+    <a class="tab-item" href="event-start.html"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h4"/></svg>一件事</a>
+    <a class="tab-item active" href="reflect.html"><svg viewBox="0 0 24 24"><path d="M5 9h14v11H5zM6 3v4m12-4v4M8 14h3m-3 3h7"/></svg>成长</a>
+  </nav>
+</div>
+<script src="store.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var S = window.HWVStore;
+  var sw = document.getElementById('writeback');
+  var growthList = document.getElementById('growth-list');
+  var noticeEl = document.getElementById('writeback-notice');
+  var done = document.getElementById('btn-done');
+  var r4 = document.getElementById('r4');
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function setNotice(text, kind) {
+    noticeEl.textContent = text || '';
+    noticeEl.className = 'notice' + (kind ? ' is-' + kind : '');
+  }
+
+  function renderGrowth() {
+    if (!S || !S.available) {
+      growthList.innerHTML = '<p class="empty-note">当前浏览器无法读取记录，这里无法显示已写入的认识。</p>';
+      return;
+    }
+    var obs = (S.read().observations || []).slice(-3).reverse();
+    if (!obs.length) {
+      growthList.innerHTML = '<p class="empty-note">还没有写入档案的认识。完成一次回顾并主动确认后，才会出现在这里。</p>';
+      return;
+    }
+    growthList.innerHTML = obs.map(function (o) {
+      var tag = o.confirmed
+        ? '<span class="pill" style="margin-top:6px">本人已确认</span>'
+        : '<span class="pill" style="margin-top:6px;background:var(--warning-soft);color:#7c4526">待确认</span>';
+      return '<div class="growth-item"><span class="dot" style="margin-top:7px"></span><div>' +
+        '<p style="font-size:var(--fs-sm);line-height:1.6;color:var(--ink-2)">' + esc(o.text) + '</p>' +
+        tag + '</div></div>';
+    }).join('');
+  }
+
+  var REVIEW_KEY = 'hwv.flow.reviewId';
+  var submitId = null;
+  var submitting = false;
+
+  function ensureSubmitId() {
+    if (submitId) return submitId;
+    try { submitId = window.sessionStorage.getItem(REVIEW_KEY); } catch (e) { submitId = null; }
+    if (!submitId) {
+      submitId = 'rev-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+      try { window.sessionStorage.setItem(REVIEW_KEY, submitId); } catch (e) {}
+    }
+    return submitId;
+  }
+
+  window.addEventListener('pageshow', function (ev) {
+    if (done) done.removeAttribute('data-done');
+    if (ev.persisted) return;            // 从缓存返回：沿用同一次回顾的提交 ID，仍被幂等拦住
+    submitting = false;
+    submitId = null;
+    try { window.sessionStorage.removeItem(REVIEW_KEY); } catch (e) {}
+    ensureSubmitId();
+  });
+  ensureSubmitId();
+
+  if (done) {
+    done.addEventListener('click', function (e) {
+      if (!sw.checked) return;
+
+      if (done.getAttribute('data-done') === '1' || submitting) {
+        e.preventDefault();
+        return;
+      }
+
+      var text = (r4 && r4.value ? r4.value : '').trim();
+      if (!text) {
+        e.preventDefault();
+        setNotice('你打开了回写开关，但还没有写下新的认识。请先写一句，或关掉这个开关。', 'warn');
+        if (r4) r4.focus();
+        return;
+      }
+      if (!S || !S.available) {
+        e.preventDefault();
+        setNotice('当前浏览器无法保存，这条认识不会写入档案。', 'warn');
+        return;
+      }
+
+      submitting = true;
+      var res = S.addObservation(text, true, { id: ensureSubmitId(), source: 'reflect' });
+      submitting = false;
+
+      if (!res.ok) {
+        e.preventDefault();
+        setNotice('写入档案失败：浏览器存储不可用或已满。你可以再试一次。', 'warn');
+        return;
+      }
+
+      if (res.reason === 'duplicate') {
+        e.preventDefault();
+        setNotice('这条认识已经在这次回顾里写入过档案，不会重复添加。', '');
+        window.setTimeout(function () { window.location.href = 'home.html'; }, 900);
+        return;
+      }
+
+      done.setAttribute('data-done', '1');
+      renderGrowth();
+    });
+  }
+
+  renderGrowth();
+})();
+</script>
+</body>
+</html>
