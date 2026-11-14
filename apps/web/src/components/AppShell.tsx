@@ -1,16 +1,17 @@
 import type { ReactNode } from 'react';
-import { TAB_ITEMS, type TabKey } from '../routes';
+import { TAB_ITEMS, type RouteDef } from '../routes';
 
 type AppShellProps = {
-  title: string;
+  /** 路由元信息（routes.ts 为唯一数据源） */
+  meta: RouteDef;
   children: ReactNode;
-  activeTab?: TabKey;
+  activeTab?: RouteDef['tab'];
   backHref?: string;
   right?: ReactNode;
   showTabs?: boolean;
 };
 
-const ICONS: Record<TabKey, ReactNode> = {
+const ICONS: Record<string, ReactNode> = {
   home: <path d="m3.5 10.5 8.5-7 8.5 7v9a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z" />,
   'know-self': (
     <>
@@ -29,22 +30,19 @@ const ICONS: Record<TabKey, ReactNode> = {
   reflect: <path d="M5 9h14v11H5zM6 3v4m12-4v4M8 14h3m-3 3h7" />,
 };
 
-const TAB_LABELS: Record<TabKey, string> = {
-  home: '首页',
-  'know-self': '认识自己',
-  understand: '理解彼此',
-  event: '一件事',
-  reflect: '成长',
-};
-
 export function AppShell({
-  title,
+  meta,
   children,
-  activeTab,
-  backHref,
+  activeTab: activeTabProp,
+  backHref: backHrefProp,
   right,
-  showTabs = true,
+  showTabs: showTabsProp,
 }: AppShellProps) {
+  const title = meta.title;
+  const activeTab = activeTabProp ?? meta.tab;
+  const backHref = backHrefProp ?? meta.backHref;
+  const showTabs = showTabsProp ?? meta.showTabs ?? true;
+
   return (
     <div className="app">
       <header className="app-topbar">
@@ -78,7 +76,7 @@ export function AppShell({
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   {ICONS[item.key]}
                 </svg>
-                {TAB_LABELS[item.key]}
+                {item.label}
               </a>
             );
           })}
