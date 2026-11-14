@@ -173,3 +173,16 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* 无障碍修补：文字链最小 44px 触控区 */
+.app-right a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.pf-inline-link a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}

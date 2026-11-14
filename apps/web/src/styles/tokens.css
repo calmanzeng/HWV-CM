@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   color-scheme: light;
 
   /* 色彩：温暖纸白底 + 竹青主色 + 暖杏点缀（v2 人文关怀版） */
@@ -9,7 +9,7 @@
   --surface-blue: #e2efe8;
   --ink: #26302a;
   --ink-2: #4f5a53;
-  --muted: #767f78;
+  --muted: #5c665f;
   --line: #e4e1d6;
   --primary: #39705e;
   --primary-dark: #2b584a;

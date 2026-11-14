@@ -522,3 +522,11 @@
 
 .pf-notice-ok { color: var(--success); }
 .pf-notice-warn { color: var(--danger); }
+
+/* 无障碍修补：跳过链最小 44px 触控区 */
+.ks-link-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-right: 4px;
+}
