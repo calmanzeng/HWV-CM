@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AppShell } from '../components/AppShell';
+import { ROUTES } from '../routes';
 import { read, readExtra, saveExtra, storageAvailable } from '../store';
 
 type Choice = 'fit' | 'revise' | 'unknown';
@@ -97,7 +98,7 @@ export default function PossibilitiesScreen() {
   ];
 
   return (
-    <AppShell title="看见不同可能" activeTab="event" backHref="/write-down" right={<a href="/">退出</a>}>
+    <AppShell meta={ROUTES['/possibilities']} right={<a href="/">退出</a>}>
       <div className="app-eyebrow">事件梳理 · 不同理解</div>
       <h1 className="app-title-lg">这些只是「可能」，不是结论</h1>
       <p className="app-lede">

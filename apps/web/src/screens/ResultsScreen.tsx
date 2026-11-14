@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AppShell } from '../components/AppShell';
+import { ROUTES } from '../routes';
 import { read, readExtra, saveResults, storageAvailable } from '../store';
 
 type Choice = 'fit' | 'revise' | 'unknown';
@@ -74,7 +75,7 @@ export default function ResultsScreen() {
 
   if (!hasAny) {
     return (
-      <AppShell title="三份整理结果" activeTab="event" backHref="/write-down">
+      <AppShell meta={ROUTES['/results']} backHref="/write-down">
         <div className="app-eyebrow">事件梳理 · 整理结果</div>
         <h1 className="app-title-lg">还没有可以整理的内容</h1>
         <p className="app-lede">
@@ -93,7 +94,7 @@ export default function ResultsScreen() {
   }
 
   return (
-    <AppShell title="三份整理结果" activeTab="event" backHref="/possibilities" right={<a href="/">保存</a>}>
+    <AppShell meta={ROUTES['/results']} right={<a href="/">保存</a>}>
       <div className="app-eyebrow">事件梳理 · 整理结果</div>
       <h1 className="app-title-lg">这是给你的，不是给你的判决</h1>
       <p className="app-lede">
