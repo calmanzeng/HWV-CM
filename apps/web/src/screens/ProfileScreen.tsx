@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { AppShell } from '../components/AppShell';
+import { ROUTES } from '../routes';
 import {
   clearAll,
   exportText,
+  isCorrupted,
   read,
   sizeBytes,
   storageAvailable,
@@ -107,12 +109,7 @@ export default function ProfileScreen() {
   }
 
   return (
-    <AppShell
-      title="个人档案"
-      activeTab="know-self"
-      backHref="/know-self"
-      right={<a href="/know-self">继续探索</a>}
-    >
+    <AppShell meta={ROUTES['/profile']} right={<a href="/know-self">继续探索</a>}>
       <span key={version} hidden />
 
       <div className="app-eyebrow">自我观察的记录</div>
@@ -193,6 +190,14 @@ export default function ProfileScreen() {
       <section className="pf-card pf-block">
         <h3 className="pf-h3">数据管理</h3>
         <p className="pf-block-text">所有内容保存在这台设备的浏览器里，不会上传。你可以随时导出带走，也可以彻底删除。</p>
+
+        {isCorrupted() && (
+          <div className="pf-callout pf-callout-danger">
+            <strong>检测到无法读取的记录。</strong>
+            <br />
+            本机保存的数据可能已损坏或来自其他版本。为保护原始内容，自动保存已暂停；你可以导出现在能读到的部分，或彻底删除后重新开始。
+          </div>
+        )}
 
         <div className="pf-meta">
           <span className="pf-pill">占用 {(sizeBytes() / 1024).toFixed(1)} KB</span>

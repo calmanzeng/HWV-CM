@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { AppShell } from '../components/AppShell';
+import { ROUTES } from '../routes';
 import { KNOW_SELF_QUESTIONS } from '../knowSelfQuestions';
 import { readExtra, saveExtra } from '../store';
 
@@ -120,12 +121,7 @@ export default function KnowSelfScreen() {
   }
 
   return (
-    <AppShell
-      title="认识自己"
-      activeTab="know-self"
-      backHref="/"
-      right={<a href="/profile">我的档案</a>}
-    >
+    <AppShell meta={ROUTES['/know-self']} right={<a href="/profile">我的档案</a>}>
       <div className="app-eyebrow">个人探索 · 一次一问</div>
       <h1 className="app-title-lg">慢慢来，不着急</h1>
       <p className="app-lede">

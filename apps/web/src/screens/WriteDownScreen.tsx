@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { AppShell } from '../components/AppShell';
+import { ROUTES } from '../routes';
 import {
   getSafety,
   read,
@@ -64,6 +65,7 @@ export default function WriteDownScreen() {
 
   const draftRef = useRef<Draft>(EMPTY);
   const timerRef = useRef<number | null>(null);
+  const allowedRef = useRef(false);
 
   draftRef.current = draft;
 
@@ -74,6 +76,7 @@ export default function WriteDownScreen() {
       return;
     }
     setAllowed(true);
+    allowedRef.current = true; // 通过安全检查后才允许离开时写回
 
     if (!storageAvailable) {
       setWarn(true);
@@ -124,6 +127,8 @@ export default function WriteDownScreen() {
         window.clearTimeout(timerRef.current);
         timerRef.current = null;
       }
+      // 未通过安全检查时不得写回：此时 draft 仍是空值，写回会把已有草稿清空
+      if (!allowedRef.current) return;
       saveEvent(draftRef.current);
     }
     window.addEventListener('pagehide', onLeave);
@@ -154,7 +159,7 @@ export default function WriteDownScreen() {
 
   if (allowed !== true) {
     return (
-      <AppShell title="写下经过" activeTab="event" backHref="/event-start">
+      <AppShell meta={ROUTES['/write-down']}>
         <p className="wd-guard">
           {allowed === false ? '正在前往安全检查…' : '正在确认安全检查状态…'}
         </p>
@@ -163,12 +168,7 @@ export default function WriteDownScreen() {
   }
 
   return (
-    <AppShell
-      title="写下经过"
-      activeTab="event"
-      backHref="/event-start"
-      right={<a href="/">退出</a>}
-    >
+    <AppShell meta={ROUTES['/write-down']} right={<a href="/">退出</a>}>
       <div className="app-eyebrow">事件梳理 · 私密叙述</div>
       <h1 className="app-title-lg">先把发生的事，分开写</h1>
       <p className="app-lede">

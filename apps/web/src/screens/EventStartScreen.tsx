@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { AppShell } from '../components/AppShell';
+import { ROUTES } from '../routes';
 import {
   getConsent,
   getSafety,
@@ -50,12 +51,7 @@ export default function EventStartScreen() {
   }
 
   return (
-    <AppShell
-      title="面对一件事"
-      activeTab="event"
-      backHref="/"
-      right={<a href="/safety">安全支持</a>}
-    >
+    <AppShell meta={ROUTES['/event-start']} right={<a href="/safety">安全支持</a>}>
       <div className="app-eyebrow">事件梳理 · 开始之前</div>
       <h1 className="app-title-lg">先看看这里安不安全</h1>
       <p className="app-lede">
