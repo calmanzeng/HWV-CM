@@ -4,6 +4,8 @@ import App from './App';
 import { WorkspaceProvider } from './useWorkspace';
 import './styles/app.css';
 import './styles/pages.css';
+import './styles/shell.css';
+import './styles/screens.css';
 
 
 createRoot(document.getElementById('root')!).render(
