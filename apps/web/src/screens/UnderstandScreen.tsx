@@ -1,4 +1,4 @@
-import { AppShell } from '../components/AppShell';
+﻿import { AppShell } from '../components/AppShell';
 import { ROUTES } from '../routes';
 import { read } from '../store';
 

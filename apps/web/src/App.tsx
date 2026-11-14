@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react';
+﻿import { useEffect, type ReactNode } from 'react';
 import { PageFrame } from './components/Layout';
 import { guardRoute } from './eventMachine';
 import { ROUTES, type RoutePath } from './routes';
