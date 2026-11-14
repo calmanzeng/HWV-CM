@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AppShell } from '../components/AppShell';
+import { ROUTES } from '../routes';
 import { clearFlow, getSafety, type SafetyDecision } from '../store';
 
 const REASON: Partial<Record<SafetyDecision, string>> = {
@@ -21,7 +22,7 @@ export default function SafetyScreen() {
   }
 
   return (
-    <AppShell title="安全支持" activeTab="home" showTabs={false} backHref="/event-start">
+    <AppShell meta={ROUTES['/safety']}>
       <section className="sf-card">
         <div className="sf-icon">
           <svg viewBox="0 0 24 24" aria-hidden="true">

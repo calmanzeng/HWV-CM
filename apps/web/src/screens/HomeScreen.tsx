@@ -1,4 +1,5 @@
 import { AppShell } from '../components/AppShell';
+import { ROUTES } from '../routes';
 import { hasContent, read } from '../store';
 
 const WEEK = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
@@ -42,7 +43,7 @@ export default function HomeScreen() {
   const dateText = `${now.getMonth() + 1} 月 ${now.getDate()} 日 · ${WEEK[now.getDay()]}`;
 
   return (
-    <AppShell title="首页" activeTab="home">
+    <AppShell meta={ROUTES['/']}>
       <section className="home-greeting">
         <div className="home-date">{dateText}</div>
         <h1 className="home-h1">今天想从哪里开始？</h1>

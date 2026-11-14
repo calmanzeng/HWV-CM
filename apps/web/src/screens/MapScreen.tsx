@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { AppShell } from '../components/AppShell';
+import { ROUTES } from '../routes';
 import {
   addObservation,
   read,
@@ -67,7 +68,7 @@ export default function MapScreen() {
   }
 
   return (
-    <AppShell title="关系差异地图" activeTab="understand" backHref="/understand">
+    <AppShell meta={ROUTES['/map']}>
       <span key={version} hidden />
 
       <div className="app-eyebrow">关系探索 · 单人观察</div>

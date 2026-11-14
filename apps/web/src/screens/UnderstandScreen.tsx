@@ -1,4 +1,5 @@
 import { AppShell } from '../components/AppShell';
+import { ROUTES } from '../routes';
 import { read } from '../store';
 
 export default function UnderstandScreen() {
@@ -6,7 +7,7 @@ export default function UnderstandScreen() {
   const count = state.observations.length;
 
   return (
-    <AppShell title="理解彼此" activeTab="understand" backHref="/">
+    <AppShell meta={ROUTES['/understand']}>
       <div className="app-eyebrow">关系探索</div>
       <h1 className="app-title-lg">看见差异，不替对方说话</h1>
       <p className="app-lede">
