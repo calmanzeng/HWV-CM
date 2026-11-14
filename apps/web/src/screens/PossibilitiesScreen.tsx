@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { AppShell } from '../components/AppShell';
 import { ROUTES } from '../routes';
 import { read, readExtra, saveExtra, storageAvailable } from '../store';
