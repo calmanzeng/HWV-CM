@@ -70,7 +70,8 @@ export type StoreReason =
   | 'unavailable'
   | 'quota'
   | 'error'
-  | 'session';
+  | 'session'
+  | 'protected';
 
 export type StoreResult = {
   ok: boolean;
@@ -134,14 +135,104 @@ const box = storage();
 
 export const storageAvailable = box !== null;
 
+/**
+ * 数据完整性保护：检测到损坏或未知版本的原始数据时为 true，
+ * 普通写入（write / saveEvent 隐式删除）将被拒绝，避免静默覆盖用户数据。
+ */
+let corrupted = false;
+
+/** 损坏/未知版本的原始字符串，保留用于导出备份，避免用户误以为数据已丢失。 */
+let corruptRaw: string | null = null;
+
+export function isCorrupted(): boolean {
+  return corrupted;
+}
+
+/**
+ * 原始 JSON 顶层结构校验（先于 normalize，防止非法字段被静默归一化丢弃）：
+ * 已定义字段的类型必须正确；任何非法类型都视为损坏，进入只读保护并保留原始数据。
+ */
+function validateRawShape(raw: unknown): string | null {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return '顶层不是对象';
+  const value = raw as Record<string, unknown>;
+  if (value.version !== SCHEMA_VERSION) return 'version 缺失或错误';
+  if ('observations' in value && !Array.isArray(value.observations)) return 'observations 不是数组';
+  if ('agreements' in value && !Array.isArray(value.agreements)) return 'agreements 不是数组';
+  if ('event' in value && value.event !== null && (typeof value.event !== 'object' || Array.isArray(value.event))) return 'event 不是对象';
+  if ('results' in value && value.results !== null && (typeof value.results !== 'object' || Array.isArray(value.results))) return 'results 不是对象';
+  if ('extra' in value && value.extra !== null && (typeof value.extra !== 'object' || Array.isArray(value.extra))) return 'extra 不是对象';
+  if ('createdAt' in value && value.createdAt !== null && typeof value.createdAt !== 'string') return 'createdAt 不是字符串';
+  if ('updatedAt' in value && value.updatedAt !== null && typeof value.updatedAt !== 'string') return 'updatedAt 不是字符串';
+  return null;
+}
+
+/** 结构校验：版本号正确但内部字段损坏（如 observations 混入 null）时视为损坏。 */
+function validateState(state: StoreState): string | null {
+  if (state.event !== null) {
+    for (const field of EVENT_FIELDS) {
+      if (typeof state.event[field] !== 'string') return `event.${field} 不是字符串`;
+    }
+  }
+  for (const item of state.observations) {
+    if (!item || typeof item !== 'object' || typeof item.text !== 'string') {
+      return 'observations 含非法元素';
+    }
+  }
+  for (const item of state.agreements) {
+    if (!item || typeof item !== 'object' || typeof item.agenda !== 'string') {
+      return 'agreements 含非法元素';
+    }
+  }
+  if (state.results !== null) {
+    if (typeof state.results !== 'object' || !state.results.data || typeof state.results.data !== 'object') {
+      return 'results 结构非法';
+    }
+  }
+  return null;
+}
+
 export function read(): StoreState {
+  corrupted = false;
+  corruptRaw = null;
   if (!box) return blank();
+  let raw: string | null = null;
   try {
-    const raw = box.getItem(STORE_KEY);
-    return raw ? normalize(JSON.parse(raw)) : blank();
+    raw = box.getItem(STORE_KEY);
   } catch {
+    // 存储读取异常：无法判断原数据是否完好，一律进入只读保护，不覆盖
+    corrupted = true;
     return blank();
   }
+  if (raw === null) return blank();
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    corrupted = true; // JSON 损坏：进入只读保护，不静默覆盖
+    corruptRaw = raw;
+    return blank();
+  }
+  // 原始顶层结构校验（先于 normalize）：已定义字段类型非法 → 保护，防止被静默归一化丢弃
+  const rawIssue = validateRawShape(parsed);
+  if (rawIssue !== null) {
+    corrupted = true;
+    corruptRaw = raw;
+    return blank();
+  }
+  if (!parsed || typeof parsed !== 'object' || (parsed as { version?: unknown }).version !== SCHEMA_VERSION) {
+    corrupted = true; // 未知/缺失版本：进入只读保护
+    corruptRaw = raw;
+    return blank();
+  }
+  const state = normalize(parsed);
+  const issue = validateState(state);
+  if (issue !== null) {
+    corrupted = true; // 结构损坏：进入只读保护
+    corruptRaw = raw;
+    return blank();
+  }
+  return state;
 }
 
 function hasExtraContent(extra: Record<string, unknown>): boolean {
@@ -177,6 +268,9 @@ function write(next: StoreState): StoreResult {
 
   if (!box) {
     return { ok: false, reason: 'unavailable', state };
+  }
+  if (corrupted) {
+    return { ok: false, reason: 'protected', state: blank() };
   }
   try {
     box.setItem(STORE_KEY, JSON.stringify(state));
@@ -215,6 +309,10 @@ export function saveEvent(patch: EventPatch): StoreResult {
 
     if (!hasOther) {
       if (!box) return { ok: false, reason: 'unavailable', state: blank() };
+      if (corrupted) {
+        // 保护模式下拒绝隐式整键删除；用户可在数据管理页显式清空
+        return { ok: false, reason: 'protected', state: blank() };
+      }
       let cleared = false;
       try {
         box.removeItem(STORE_KEY);
@@ -323,6 +421,10 @@ export function clearAll(): StoreResult {
   }
   if (!removed) return { ok: false, reason: 'error', state: read() };
 
+  // 主键已确认删除：损坏保护随之解除，会话键残留另行报告
+  corrupted = false;
+  corruptRaw = null;
+
   const keys = Object.values(SESSION_KEYS);
   let sessionUsable = true;
   try {
@@ -332,27 +434,29 @@ export function clearAll(): StoreResult {
     sessionUsable = false;
   }
 
-  if (sessionUsable) {
-    for (const key of keys) {
-      try {
-        window.sessionStorage.removeItem(key);
-      } catch {
-        /* 逐项回读会给出结论 */
-      }
+  if (!sessionUsable) {
+    // sessionStorage 不可访问：四个会话键无法核验，不得签发删除成功
+    return { ok: false, reason: 'session', state: blank(), sessionKeys: keys };
+  }
+  for (const key of keys) {
+    try {
+      window.sessionStorage.removeItem(key);
+    } catch {
+      /* 逐项回读会给出结论 */
     }
-    const left: string[] = [];
-    for (const key of keys) {
-      let remains: string | null = null;
-      try {
-        remains = window.sessionStorage.getItem(key);
-      } catch {
-        remains = 'unreadable';
-      }
-      if (remains !== null) left.push(key);
+  }
+  const left: string[] = [];
+  for (const key of keys) {
+    let remains: string | null = null;
+    try {
+      remains = window.sessionStorage.getItem(key);
+    } catch {
+      remains = 'unreadable';
     }
-    if (left.length) {
-      return { ok: false, reason: 'session', state: blank(), sessionKeys: left };
-    }
+    if (remains !== null) left.push(key);
+  }
+  if (left.length) {
+    return { ok: false, reason: 'session', state: blank(), sessionKeys: left };
   }
 
   return { ok: true, reason: 'deleted', state: blank() };
@@ -369,6 +473,20 @@ export function sizeBytes(): number {
 }
 
 export function exportText(): string {
+  if (corrupted && corruptRaw !== null) {
+    // 数据损坏：导出原始内容，注明未做解析，便于人工恢复
+    return JSON.stringify(
+      {
+        app: 'HWV-CM',
+        schema: SCHEMA_VERSION,
+        exportedAt: new Date().toISOString(),
+        note: '本机数据无法识别（损坏或版本不兼容），以下为原始存储内容，未做任何改写。可人工核对后重新导入。',
+        preservedRaw: corruptRaw,
+      },
+      null,
+      2,
+    );
+  }
   const state = read();
   return JSON.stringify(
     {
