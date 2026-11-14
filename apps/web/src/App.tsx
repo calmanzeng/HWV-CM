@@ -15,7 +15,9 @@ import EventStartScreen from './screens/EventStartScreen';
 import HomeScreen from './screens/HomeScreen';
 import KnowSelfScreen from './screens/KnowSelfScreen';
 import MapScreen from './screens/MapScreen';
+import PossibilitiesScreen from './screens/PossibilitiesScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import ResultsScreen from './screens/ResultsScreen';
 import SafetyScreen from './screens/SafetyScreen';
 import UnderstandScreen from './screens/UnderstandScreen';
 import WriteDownScreen from './screens/WriteDownScreen';
@@ -32,6 +34,8 @@ const V2_SCREENS: Record<string, ReactNode> = {
   '/map': <MapScreen />,
   '/event-start': <EventStartScreen />,
   '/write-down': <WriteDownScreen />,
+  '/possibilities': <PossibilitiesScreen />,
+  '/results': <ResultsScreen />,
   '/safety': <SafetyScreen />,
 };
 

@@ -95,6 +95,18 @@ export default function WriteDownScreen() {
     }
   }, []);
 
+  useEffect(() => {
+    function onPageShow(event: PageTransitionEvent) {
+      if (!event.persisted) return;
+      // BFCache 恢复不会重新挂载组件，必须在这里重新校验安全状态
+      if (getSafety() !== 'safe') {
+        window.location.replace('/event-start?need-safety=1');
+      }
+    }
+    window.addEventListener('pageshow', onPageShow);
+    return () => window.removeEventListener('pageshow', onPageShow);
+  }, []);
+
   function flush(): boolean {
     const result = saveEvent(draftRef.current);
     if (result.ok) {
